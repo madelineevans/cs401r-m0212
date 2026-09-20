@@ -1,0 +1,129 @@
+== NorthStar Lab 1 â€” LocalStack validation ==
+date: 2026-09-20T03:40:02Z
+
+== terraform init ==
+Initializing the backend...
+
+Initializing modules...
+
+Initializing provider plugins...
+- Reusing previous version of hashicorp/aws from the dependency lock file
+- Using previously-installed hashicorp/aws v5.100.0
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+
+== terraform apply ==
+module.iam.data.aws_caller_identity.current: Reading...
+module.storage.data.aws_caller_identity.current: Reading...
+module.iam.data.aws_partition.current: Reading...
+module.vpc.aws_vpc.this: Refreshing state... [id=vpc-eefa5d8927f4a845a]
+module.iam.aws_iam_role.ml_engineer: Refreshing state... [id=northstar-local-MLEngineer]
+module.iam.data.aws_partition.current: Read complete after 0s [id=aws]
+module.iam.data.aws_caller_identity.current: Read complete after 0s [id=000000000000]
+module.storage.data.aws_caller_identity.current: Read complete after 0s [id=000000000000]
+module.storage.aws_s3_bucket.data: Refreshing state... [id=northstar-local-data-000000000000]
+module.iam.aws_iam_policy.ml_engineer: Refreshing state... [id=arn:aws:iam::000000000000:policy/NorthStarMLEngineerPolicy]
+module.storage.aws_s3_bucket_public_access_block.data: Refreshing state... [id=northstar-local-data-000000000000]
+module.storage.aws_s3_bucket_versioning.data: Refreshing state... [id=northstar-local-data-000000000000]
+module.storage.aws_s3_object.prefix["processed/"]: Refreshing state... [id=processed/]
+module.storage.aws_s3_object.prefix["artifacts/"]: Refreshing state... [id=artifacts/]
+module.storage.aws_s3_object.prefix["raw/"]: Refreshing state... [id=raw/]
+module.storage.aws_s3_object.prefix["features/"]: Refreshing state... [id=features/]
+module.storage.aws_s3_bucket_server_side_encryption_configuration.data: Refreshing state... [id=northstar-local-data-000000000000]
+module.iam.aws_iam_role_policy_attachment.ml_engineer: Refreshing state... [id=northstar-local-MLEngineer-20260920032551956900000001]
+module.vpc.aws_internet_gateway.this: Refreshing state... [id=igw-89088b623856bf2d1]
+module.vpc.aws_subnet.public: Refreshing state... [id=subnet-b3191eec51a0110f1]
+module.vpc.aws_security_group.this: Refreshing state... [id=sg-abf2c5d55d21a0f22]
+module.vpc.aws_route_table.public: Refreshing state... [id=rtb-0a8c87e46106b1acb]
+module.vpc.aws_route_table_association.public: Refreshing state... [id=rtbassoc-b3edbc005932f3a0a]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+ml_engineer_role_arn = "arn:aws:iam::000000000000:role/northstar-local-MLEngineer"
+public_subnet_id = "subnet-b3191eec51a0110f1"
+s3_bucket_name = "northstar-local-data-000000000000"
+vpc_id = "vpc-eefa5d8927f4a845a"
+
+== awslocal sts get-caller-identity ==
+{
+    "UserId": "AKIAIOSFODNN7EXAMPLE",
+    "Account": "000000000000",
+    "Arn": "arn:aws:iam::000000000000:root"
+}
+
+== awslocal s3 ls s3://northstar-local-data-000000000000/ --recursive  (name from: terraform output s3_bucket_name) ==
+2026-09-19 21:25:53          0 artifacts/
+2026-09-19 21:25:53          0 features/
+2026-09-19 21:25:53          0 processed/
+2026-09-19 21:25:53          0 raw/
+
+== awslocal iam list-roles (northstar*) ==
+[
+    "northstar-local-MLEngineer"
+]
+
+== awslocal ec2 describe-vpcs ==
+[
+    {
+        "Id": "vpc-ac6e66d428abc161d",
+        "CIDR": "172.31.0.0/16"
+    },
+    {
+        "Id": "vpc-eefa5d8927f4a845a",
+        "CIDR": "10.0.0.0/16"
+    }
+]
+
+== awslocal ec2 describe-subnets ==
+[
+    {
+        "Id": "subnet-3e94d1ce23521704d",
+        "AZ": "us-east-1a",
+        "CIDR": "172.31.0.0/20"
+    },
+    {
+        "Id": "subnet-b3191eec51a0110f1",
+        "AZ": "us-east-1a",
+        "CIDR": "10.0.100.0/24"
+    },
+    {
+        "Id": "subnet-efd85fcbbde215414",
+        "AZ": "us-east-1b",
+        "CIDR": "172.31.16.0/20"
+    },
+    {
+        "Id": "subnet-43954cd3588b8a1bb",
+        "AZ": "us-east-1c",
+        "CIDR": "172.31.32.0/20"
+    },
+    {
+        "Id": "subnet-cc2ddfe304dc56a88",
+        "AZ": "us-east-1d",
+        "CIDR": "172.31.48.0/20"
+    },
+    {
+        "Id": "subnet-619d9dad3d045fff8",
+        "AZ": "us-east-1e",
+        "CIDR": "172.31.64.0/20"
+    },
+    {
+        "Id": "subnet-95d56a28a6448408e",
+        "AZ": "us-east-1f",
+        "CIDR": "172.31.80.0/20"
+    }
+]

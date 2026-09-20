@@ -1,10 +1,10 @@
-# infrastructure/ — Lab 1 Part B Terraform skeleton
+# infrastructure/ — Lab 1 Part B Terraform modules
 
-Skeleton for Task B1. **It is empty on purpose**: every file declares its
-variables and outputs, and `main.tf` lists the resources you owe, but no
-resources are written for you.
+Terraform implementation for Task B1. The four reusable modules are wired
+into the AWS `dev` environment and the VPC, storage, and IAM modules are also
+used by the LocalStack `local` environment.
 
-Verify it starts clean before you add anything:
+Verify the implementation:
 
 ```bash
 cd environments/dev

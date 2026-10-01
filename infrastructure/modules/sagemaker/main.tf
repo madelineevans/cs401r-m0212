@@ -29,6 +29,8 @@ resource "aws_sagemaker_domain" "this" {
     execution_role  = var.execution_role_arn
     security_groups = var.security_group_ids
 
+    studio_web_portal_settings {}
+
     sharing_settings {
       notebook_output_option = "Disabled"
     }

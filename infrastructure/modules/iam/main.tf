@@ -194,7 +194,8 @@ resource "aws_iam_policy" "data_engineer" {
         Resource = [
           "${local.bucket_arn}/raw/*",
           "${local.bucket_arn}/processed/*",
-          "${local.bucket_arn}/features/*"
+          "${local.bucket_arn}/features/*",
+          "${local.bucket_arn}/features_$folder$"
         ]
       },
       {
@@ -205,21 +206,14 @@ resource "aws_iam_policy" "data_engineer" {
         ]
         Resource = "${local.bucket_arn}/artifacts/glue/*"
       },
+      # Glue's S3A connector performs an unqualified ListBucket call while
+      # resolving prefixes. Keep object access scoped below; ListBucket itself
+      # is metadata-only and is limited to the data bucket.
       {
         Sid      = "ListDataPrefixes"
         Effect   = "Allow"
         Action   = "s3:ListBucket"
         Resource = local.bucket_arn
-        Condition = {
-          StringLike = {
-            "s3:prefix" = [
-              "raw/*",
-              "processed/*",
-              "features/*",
-              "artifacts/glue/*"
-            ]
-          }
-        }
       },
       {
         Sid    = "FeatureStoreOperations"

@@ -43,66 +43,68 @@ STRING_COLS = ["payment_method", "channel", "store_id", "product_category"]
 
 
 def cast_types(df):
-    """Cast every column to its SCHEMA type. Drop rows with no customer_id.
+    """Cast every column to its SCHEMA type. Drop rows with no customer_id."""
+    # Trim whitespace from every crawler-inferred string column.
+    for column in df.columns:
+        df = df.withColumn(column, F.trim(F.col(column)))
 
-    Three things to handle, in this order:
+    # Convert empty strings to null.
+    for column in df.columns:
+        df = df.withColumn(
+            column,
+            F.when(F.length(F.col(column)) == 0, F.lit(None))
+             .otherwise(F.col(column))
+        )
 
-    1. TRIM whitespace on every column first. A customer_id of
-       "  CUST-10000001 " is not null, but it will not group or join
-       correctly either, and the bug is invisible until your feature
-       counts come out slightly wrong.
-    2. Convert empty strings to real nulls. CSV gives you "" where you
-       want None; Spark treats those as different things.
-    3. Parse purchase_date. Most rows are ISO 8601 (yyyy-MM-dd) but a few
-       percent are MM/dd/yyyy. F.to_date returns null on a format
-       mismatch instead of raising, so parse both formats and coalesce.
-       If you only parse the ISO form you will silently null out the
-       other rows and then drop them.
+    # Parse both supported date formats.
+    df = df.withColumn(
+        "purchase_date",
+        F.coalesce(
+            F.to_date(F.col("purchase_date"), "yyyy-MM-dd"),
+            F.to_date(F.col("purchase_date"), "MM/dd/yyyy"),
+        ),
+    )
 
-    Finally, drop rows where customer_id is null. That column is the join
-    key for every downstream feature, so a row without it cannot be
-    attributed to anyone.
-    """
-    # TODO: your implementation here
-    raise NotImplementedError("cast_types is not implemented")
+    # Enforce the target schema.
+    for column, data_type in SCHEMA.items():
+        df = df.withColumn(column, F.col(column).cast(data_type))
 
+    return df.filter(F.col("customer_id").isNotNull())
 
 def impute_nulls(df):
-    """Numeric columns -> column median. String columns -> 'unknown'.
+    """Numeric columns -> column median. String columns -> 'unknown'."""
+    for column in NUMERIC_COLS:
+        median_values = df.approxQuantile(column, [0.5], 0.0)
 
-    Use the MEDIAN, not the mean. order_value is right-skewed: a handful
-    of large orders drags a mean-imputed value well above the typical
-    order and quietly inflates every monetary feature you compute later.
+        if not median_values:
+            raise ValueError(f"Cannot calculate median for {column}")
 
-    DataFrame.approxQuantile(col, [0.5], 0.0) gives you an exact median.
-    Remember num_items is an integer column - round before you fill it.
+        median = median_values[0]
 
-    Numeric columns: NUMERIC_COLS.  String columns: STRING_COLS.
-    """
-    # TODO: your implementation here
-    raise NotImplementedError("impute_nulls is not implemented")
+        if column == "num_items":
+            median = int(round(median))
+
+        df = df.na.fill({column: median})
+
+    for column in STRING_COLS:
+        df = df.na.fill({column: "unknown"})
+
+    return df
 
 
 def deduplicate(df):
-    """Keep one row per transaction_id.
+    """Keep one row per transaction_id."""
+    window = Window.partitionBy("transaction_id").orderBy(
+        F.col("purchase_date").desc_nulls_last(),
+        F.col("order_value").desc_nulls_last(),
+        F.col("num_items").desc_nulls_last(),
+    )
 
-    Deduplicate on transaction_id, NOT on customer_id. A customer is
-    expected to have many transactions - that purchase history is exactly
-    what the feature engineering job aggregates over in Task 3.
-    Collapsing to one row per customer here makes total_lifetime_value
-    and purchase_frequency_30d impossible to compute, and you will not
-    discover it until Task 3 fails.
-
-    Duplicates are ingestion artifacts: the same transaction landing twice
-    from a retry. Break ties deterministically (for example by
-    purchase_date descending, then order_value descending) so repeated
-    runs produce the same output rather than depending on partition order.
-
-    A window function with row_number() over a partition by transaction_id
-    is the idiomatic approach.
-    """
-    # TODO: your implementation here
-    raise NotImplementedError("deduplicate is not implemented")
+    return (
+        df.withColumn("_row_number", F.row_number().over(window))
+          .filter(F.col("_row_number") == 1)
+          .drop("_row_number")
+    )
 
 
 def main():

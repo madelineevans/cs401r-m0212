@@ -27,3 +27,8 @@ output "sagemaker_domain_id" {
   description = "ID of the SageMaker Domain"
   value       = module.sagemaker.domain_id
 }
+
+output "feature_group_name" {
+  description = "SageMaker Feature Group name"
+  value       = module.feature_store.feature_group_name
+}

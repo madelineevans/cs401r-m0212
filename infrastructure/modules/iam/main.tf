@@ -169,6 +169,7 @@ resource "aws_iam_policy" "data_engineer" {
           "ec2:DescribeSubnets",
           "ec2:DescribeSecurityGroups",
           "ec2:DescribeVpcs",
+          "ec2:DescribeVpcEndpoints",
           "ec2:DescribeRouteTables",
           "ec2:DescribeAvailabilityZones"
         ]

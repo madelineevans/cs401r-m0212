@@ -1,0 +1,83 @@
+sagemaker.config INFO - Not applying SDK defaults from location: C:\ProgramData\sagemaker\sagemaker\config.yaml
+sagemaker.config INFO - Not applying SDK defaults from location: C:\Users\maema\AppData\Local\sagemaker\sagemaker\config.yaml
+python : C:\Users\maema\miniconda3\envs\cs401r-lab3
+\Lib\site-packages\sagemaker\__init__.py:86:
+SageMakerV2DeprecationWarning: You are using the
+SageMaker Python SDK v2, which is on path of
+deprecation. v3 is the actively developed major
+version.
+At line:1 char:1
++ python -X utf8 .\churn_training_skeleton.py
+--artifacts-bucket norths ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Us
+   ers\maema\... major version.:String) [], Remot
+  eException
+    + FullyQualifiedErrorId : NativeCommandError
+
+See https://github.com/aws/sagemaker-python-sdk/blo
+b/master/migration.md for the migration guide. Set
+SAGEMAKER_SUPPRESS_V2_WARNING=1 to silence this
+warning.
+  warn_v2_deprecation()
+You are using the SageMaker Python SDK v2, which
+is on path of deprecation. v3 is the actively
+developed major version.
+See https://github.com/aws/sagemaker-python-sdk/blo
+b/master/migration.md for the migration guide. Set
+SAGEMAKER_SUPPRESS_V2_WARNING=1 to silence this
+warning.
+============================================================
+NorthStar Churn Prediction Î“Ã‡Ã¶ Training Script
+============================================================
+Athena QueryExecutionId: 54001613-56bb-4785-aae6-b54fe445cd96
+Preprocessing 9,999 samples...
+  Positive class rate: 22.0%
+  Feature matrix shape: (9999, 11)
+
+Train: 6,999 | Validation: 3,000
+
+Training XGBoost with params: {
+  "objective": "binary:logistic",
+  "eval_metric": [
+    "logloss",
+    "auc"
+  ],
+  "max_depth": 6,
+  "eta": 0.1,
+  "min_child_weight": 5,
+  "subsample": 0.8,
+  "colsample_bytree": 0.8,
+  "scale_pos_weight": 3.544805194805195,
+  "seed": 42,
+  "verbosity": 1
+}
+[0]	train-logloss:0.66869	train-auc:0.78124	validation-logloss:0.67063	validation-auc:0.74715
+[25]	train-logloss:0.48170	train-auc:0.85988	validation-logloss:0.52092	validation-auc:0.78230
+[27]	train-logloss:0.47757	train-auc:0.86243	validation-logloss:0.51908	validation-auc:0.78186
+C:\Users\maema\cs401R\cs401r-m0212\churn_training_s
+keleton.py:728: UserWarning: [22:06:50] WARNING: C:
+\actions-runner\_work\xgboost\xgboost\src\c_api\c_a
+pi.cc:1573: Saving model in the UBJSON format as
+default.  You can use a file extension: `json` or
+`ubj` to choose between formats.
+  model.save_model(model_path)
+
+Î“Ã¶Ã‡Î“Ã¶Ã‡ Evaluation Results Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡Î“Ã¶Ã‡
+  precision_top10          : 0.7167  (threshold: 0.5000)  Î“Â£Ã´ PASS
+  recall_top10             : 0.3258  (threshold: 0.2500)  Î“Â£Ã´ PASS
+  auc_lift 95% CI          : [0.0404, 0.0767]  (must exclude 0)  Î“Â£Ã´ PASS
+  All thresholds passed Î“Â£Ã´
+Model archive saved to ./model\model.tar.gz
+
+Î“Â£Ã´ Model saved to ./model\model.xgb
+Model uploaded to s3://northstar-dev-data-722160254691/artifacts/models/churn/20261013T040651Z/model.tar.gz
+Model registered: arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/4
+â‰¡Æ’Ã…Ã¢ View run xgb-depth6-eta0.1-final at: https://mlflow.sagemaker.us-east-1.app.aws/#/experiments/1/runs/3a142e64c8a14fa9a6e33095ce34adbe
+â‰¡Æ’ÂºÂ¬ View experiment at: https://mlflow.sagemaker.us-east-1.app.aws/#/experiments/1
+TODO: Log run to MLflow App (see comments above)
+
+============================================================
+Training complete. AUC-ROC: 0.7819
+============================================================

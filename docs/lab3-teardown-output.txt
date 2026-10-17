@@ -1,0 +1,14 @@
+Lab 3 AWS teardown verification
+Checked with the AWS CLI in PowerShell, profile MaeAdmin, region us-east-1.
+The supplied Bash script could not run in WSL because the AWS CLI is not installed there; these are direct AWS CLI checks, not that script's output.
+
+OK  SageMaker endpoints: none
+OK  SageMaker endpoint configurations: none
+OK  SageMaker training jobs in progress: none
+OK  SageMaker processing jobs in progress: none
+OK  SageMaker MLflow tracking servers: none
+OK  NAT gateways: none
+OK  SageMaker domains: none
+OK  SageMaker Feature Store groups: none
+
+Retained, non-compute resources: serverless MLflow App northstar-mlflow; Model Registry group northstar-churn-models; S3 bucket northstar-dev-data-722160254691 (81 objects, 23,371,047 bytes); Terraform state bucket northstar-tfstate-722160254691. S3 storage may continue to incur small storage charges.

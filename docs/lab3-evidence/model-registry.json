@@ -1,0 +1,53 @@
+{
+  "ModelPackageGroupName": "northstar-churn-models",
+  "Versions": [
+    {
+      "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/4",
+      "ModelPackageVersion": 4,
+      "ModelApprovalStatus": "PendingManualApproval",
+      "CreationTime": "2026-10-12 22:06:56.602000-06:00",
+      "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.7819, precision@top10=0.7167, recall@top10=0.3258",
+      "CustomerMetadataProperties": {
+        "auc_roc": "0.7819",
+        "precision_top10": "0.7167",
+        "recall_top10": "0.3258"
+      }
+    },
+    {
+      "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/3",
+      "ModelPackageVersion": 3,
+      "ModelApprovalStatus": "PendingManualApproval",
+      "CreationTime": "2026-10-12 22:00:28.782000-06:00",
+      "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.78, precision@top10=0.72, recall@top10=0.3273",
+      "CustomerMetadataProperties": {
+        "auc_roc": "0.78",
+        "precision_top10": "0.72",
+        "recall_top10": "0.3273"
+      }
+    },
+    {
+      "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/2",
+      "ModelPackageVersion": 2,
+      "ModelApprovalStatus": "PendingManualApproval",
+      "CreationTime": "2026-10-12 21:58:19.055000-06:00",
+      "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.7823, precision@top10=0.71, recall@top10=0.3227",
+      "CustomerMetadataProperties": {
+        "auc_roc": "0.7823",
+        "precision_top10": "0.71",
+        "recall_top10": "0.3227"
+      }
+    },
+    {
+      "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/1",
+      "ModelPackageVersion": 1,
+      "ModelApprovalStatus": "PendingManualApproval",
+      "CreationTime": "2026-10-12 21:53:45.557000-06:00",
+      "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.7819, precision@top10=0.7167, recall@top10=0.3258",
+      "CustomerMetadataProperties": {
+        "auc_roc": "0.7819",
+        "precision_top10": "0.7167",
+        "recall_top10": "0.3258"
+      }
+    }
+  ]
+}

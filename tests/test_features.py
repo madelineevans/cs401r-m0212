@@ -346,8 +346,3 @@ class TestSingleTransactionEdgeCase:
         assert features["avg_basket_size_6m"] == pytest.approx(num_items)
         assert features["category_diversity_score"] == pytest.approx(1 / 8)
         assert features["online_to_store_ratio"] == pytest.approx(1.0)
-
-
-def test_lab4_intentional_ci_failure_demo():
-    """Temporary failure so the PRE_BUILD gate and alarm can be observed."""
-    assert False, "Lab 4 failure demonstration: remove this test after the run"

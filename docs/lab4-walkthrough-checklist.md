@@ -20,7 +20,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] `ml.m5.large` spot-training quota is now 4 in `us-east-1`.
 - [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection is `AVAILABLE`.
 - [x] Deployed `northstar-cicd`. The first run exposed a malformed nested Feature Store marker key; the second run used the curated commit-specific Parquet prefix and training succeeded. Registration then exposed missing scoped Model Registry permissions on `MLEngineer`; the Terraform policy is now updated and applied. A third manual run on `cdcb7827` passed training, registration, and CodeBuild gates; package v5 and the CodePipeline approval action are now approved.
-- [ ] Automatic push trigger still needs verification: explicit V2 `GitHubSource` push trigger for `main` is deployed and appears in `get-pipeline`, but push `4c1062f` did not start an execution. The deliberate-failure push will test it again.
+- [ ] Automatic push trigger still needs verification: explicit V2 `GitHubSource` push trigger for `main` is deployed and appears in `get-pipeline`, but pushes of `4c1062f`, `470506f`, `753a911`, and `a2ba7ca` did not start executions. All verification runs were started manually. Check the AWS Connector for GitHub installation and webhook permission.
 - [x] Local `tests/test_data.py` run against refreshed outputs: 28 passed, including schema, transaction grain, leakage, bounds, freshness under 48 hours, and consistency checks.
 
 ## 1. Finish Task 1 and local model implementation
@@ -38,7 +38,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 
 - [x] Implement `train(df, seed=42)` in `models/churn/churn_model.py` using the Lab 3 preprocessing, train/validation split, XGBoost training, recency-only baseline, and evaluation.
 - [x] Return an `xgboost.Booster` and metrics including `precision_top10`, `recall_top10`, `baseline_auc_roc`, `lift_ci_low`, and `lift_ci_high`; include per-tier results for fairness review. The local SageMaker adapter run completed and wrote these outputs.
-- [ ] Keep training code in `models/churn/`; do not import the Lab 3 script or add top-level `mlflow`/`sagemaker` imports.
+- [x] Keep training code in `models/churn/`; `churn_model.py` has no Lab 3 script, `mlflow`, or top-level `sagemaker` imports.
 - [x] Run the model and fairness tests with the generated model and evaluation metrics paths. Result: 22 passed, 1 skipped for no Approved champion; fairness warning appeared.
 
 ## 2. Prepare AWS prerequisites (no training until quota is confirmed)
@@ -52,7 +52,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 
 ## 3. CI/CD pipeline and failure demonstration (30 points)
 
-- [ ] Document the five logical phases in order: Source → Test → Build → Evaluate → Register. The reference CodePipeline has Source, Build, and ManualApproval stages; map phases to stages rather than creating one stage per phase.
+- [x] Document the five logical phases in order: Source → Test → Build → Evaluate → Register. The assessment maps them to the existing Source, Build, and ManualApproval stages.
 - [x] Pushed the initial Lab 4 implementation to `main` before deploying `pipeline.yaml`; stack creation triggered a run immediately.
 - [x] After the training-input and IAM fixes were pushed, a green run trained through `churn_model.train()`, passed the metric/fairness gates, and registered version 5. Package v5 is Approved and serves as champion.
 - [x] Set model package v5 to `Approved` in SageMaker Model Registry. AWS confirms it can serve as the champion for the later regression check.
@@ -63,7 +63,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Save failed build excerpt in `docs/lab4-build-failed.log` and before/after details in `docs/lab4-failure-demo.txt`.
 - [x] Save the received alarm email screenshot showing its received time to `docs/lab4-alarm-email.png` (received 4:00 PM).
 - [x] Revert the deliberate test and push. Recovery commit `753a911` passed CodeBuild, the alarm returned to OK, and new package v8 is `PendingManualApproval`; recovery evidence is recorded.
-- [ ] Keep both the failure commit and revert in `main` history.
+- [x] Keep both the deliberate-failure commit `470506f` and its revert `c521920` in `main` history.
 
 ## 4. MLOps configuration and maturity assessment (40 points)
 
@@ -71,7 +71,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Add `## Champion-Challenger` with a numeric, binary replacement criterion.
 - [x] Add `## Retraining Triggers` with an automatable schedule and an automatable performance trigger; name the AWS service for each. Both are clearly marked as proposals, not deployed.
 - [x] Document four finished MLflow App runs with differing hyperparameters and metrics, including the App tracking URI, in `docs/lab4-mlflow-runs.txt`. These existing runs were created 2026-10-13; create new Lab 4-dated runs only if the instructor requires them.
-- [x] Add training data S3 URI and timestamp, full code commit SHA, and evaluation metrics to approved package v5's customer metadata; save the full description as `docs/lab4-model-package.json`. Future builds now attach these fields in `post_build`.
+- [x] Add training data S3 URI and timestamp, full code commit SHA, and evaluation metrics to the approved v5 package and newest v8 candidate; `docs/lab4-model-package.json` contains the full v8 description. Future builds attach these fields in `post_build`.
 - [ ] Review the ~400-word draft under `## DataOps Maturity` and `## MLOps Maturity`; personalize the maturity ratings and priorities.
 
 ## 5. Capture evidence, teardown, and submit

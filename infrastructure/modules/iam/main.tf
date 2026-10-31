@@ -195,6 +195,7 @@ resource "aws_iam_policy" "data_engineer" {
         Resource = [
           "${local.bucket_arn}/raw/*",
           "${local.bucket_arn}/processed/*",
+          "${local.bucket_arn}/processed_$folder$",
           "${local.bucket_arn}/features/*",
           "${local.bucket_arn}/features_$folder$"
         ]

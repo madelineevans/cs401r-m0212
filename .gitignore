@@ -10,3 +10,8 @@ __pycache__/
 .aws/
 .localstack/
 /rag/local_index/
+/.pytest_cache/
+/reports/
+/data/northstar-raw-sample.csv
+/data/processed/
+/data/features/

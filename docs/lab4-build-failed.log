@@ -1,0 +1,22 @@
+Lab 4 intentional test-failure evidence
+=======================================
+This is a selected excerpt from the full CloudWatch log.
+Log group: /aws/codebuild/northstar-ci
+Log stream: c5b1ed1e-9024-43c6-8076-a369763b541f
+Full log: https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Fcodebuild$252Fnorthstar-ci/log-events/c5b1ed1e-9024-43c6-8076-a369763b541f
+
+Source commit: 470506f0d71777575b8a13a85e767f24bf6c46d6
+CodeBuild: northstar-ci:c5b1ed1e-9024-43c6-8076-a369763b541f — FAILED
+PRE_BUILD: FAILED
+  Error while executing command: python -m pytest tests/test_features.py -v
+  --tb=short --junitxml=reports/feature_tests.xml. Reason: exit status 1
+
+tests/test_features.py::test_lab4_intentional_ci_failure_demo FAILED [100%]
+tests/test_features.py:353: in test_lab4_intentional_ci_failure_demo
+  assert False, "Lab 4 failure demonstration: remove this test after the run"
+E AssertionError: Lab 4 failure demonstration: remove this test after the run
+========================= 1 failed, 19 passed in 0.50s =========================
+[Container] 2026/10/31 21:59:12.374567 Phase complete: PRE_BUILD State: FAILED
+
+The CodeBuild failure occurred before the SageMaker pipeline was started; no
+model package was registered by this corrected failure run.

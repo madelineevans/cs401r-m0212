@@ -77,3 +77,21 @@ opportunity to verify the trigger while also exercising the failure alarm.
 Alarm before failure demonstration: northstar-ci-build-failure was OK at
 2026-10-31T14:25:22-06:00. SNS email subscription is confirmed on the topic
 northstar-model-approvals.
+
+Run 5 — deliberate PRE_BUILD failure
+------------------------------------
+Failure-test commit: 470506f0d71777575b8a13a85e767f24bf6c46d6
+CodePipeline execution: a50a34d8-39ab-4f3f-8f15-b2ba0bf3461d
+Trigger: StartPipelineExecution (manual; push did not start an execution)
+CodeBuild: northstar-ci:c5b1ed1e-9024-43c6-8076-a369763b541f — FAILED
+The intentional test in `tests/test_features.py` failed in PRE_BUILD:
+1 failed, 19 passed. No SageMaker execution or package registration occurred
+in this corrected failure run.
+Alarm entered ALARM at 2026-10-31T16:00:22-06:00. CloudWatch history confirms
+the SNS action succeeded. The email screenshot is still to be saved.
+
+Earlier stopped attempt: commit 7289889 contained a standalone test that was
+not included in the explicit PRE_BUILD pytest commands. CodeBuild was stopped
+in BUILD after SageMaker execution gm8hogpfainv completed. Its package v7 was
+rejected because the CodeBuild model gates did not run. This is not the rubric
+failure evidence; use Run 5.

@@ -1,0 +1,32 @@
+Lab 4 deliberate-failure demonstration
+=======================================
+
+BEFORE
+- Alarm: northstar-ci-build-failure — OK at 2026-10-31 14:25:22 -06:00.
+- SNS topic: arn:aws:sns:us-east-1:722160254691:northstar-model-approvals
+- Confirmed email subscription ARN:
+  arn:aws:sns:us-east-1:722160254691:northstar-model-approvals:8d62f820-66a2-41de-b45f-fc33b6e8bdec
+
+FAILURE
+- Failure-test commit: 470506f0d71777575b8a13a85e767f24bf6c46d6
+- CodePipeline execution: a50a34d8-39ab-4f3f-8f15-b2ba0bf3461d
+- CodeBuild build: northstar-ci:c5b1ed1e-9024-43c6-8076-a369763b541f
+- The pushed commit did not start automatically. The run was started manually;
+  automatic push triggering remains unresolved.
+- CodeBuild failed in PRE_BUILD while running tests/test_features.py:
+  1 failed, 19 passed. The failure was the intentional assertion in
+  test_lab4_intentional_ci_failure_demo.
+- SageMaker was not started by this corrected run; no package was registered.
+- Alarm: ALARM at 2026-10-31 16:00:22 -06:00.
+- CloudWatch alarm history: "Successfully executed action" for the SNS topic.
+- Email receipt screenshot: docs/lab4-alarm-email.png (received Sat 10/31/2026
+  at 4:00 PM; shows the alarm changed from OK to ALARM).
+
+AFTER REVERT
+- Pending: revert the temporary failure test, push, confirm CodeBuild succeeds,
+  alarm returns to OK, and the new model package remains PendingManualApproval.
+
+Note: An earlier, incorrectly scoped demo test was not part of the PRE_BUILD
+command. That run was stopped after SageMaker had already started and completed;
+its ungated package v7 was rejected. The corrected demonstration above is the
+one to use as rubric evidence.

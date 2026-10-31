@@ -77,8 +77,14 @@ def build_pipeline(role_arn: str, bucket: str, region: str = "us-east-1") -> Pip
     # the code is the working tree CodeBuild cloned rather than a URI that could
     # point anywhere. CommitSha survives as a parameter for traceability.
     commit_sha = ParameterString("CommitSha", default_value="unknown")
+    # CodeBuild stages only the root Parquet parts into this curated prefix and
+    # passes the exact commit-specific URI at execution time. The source
+    # Feature Store prefix also contains offline-store marker objects that are
+    # not training data and cannot be staged by SageMaker's S3 downloader.
     input_data = ParameterString(
-        "InputDataS3Uri", default_value=f"s3://{bucket}/features/customers/")
+        "InputDataS3Uri",
+        default_value=f"s3://{bucket}/artifacts/training-inputs/required/",
+    )
     instance_type = ParameterString("TrainingInstanceType", default_value="ml.m5.large")
 
     # See the ModelMetrics comment below for why this URI is built by hand and

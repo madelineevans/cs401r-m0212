@@ -135,6 +135,28 @@ phases:
       # (defect 66).
       - export COMMIT_SHA=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c1-8)
 
+      # The Feature Store prefix also contains timestamped offline-store
+      # marker objects (including a malformed double-slash key). SageMaker's
+      # S3 training channel attempts to stage every object under a prefix, so
+      # curate only the root-level Parquet parts into an isolated commit path.
+      - export TRAINING_DATA_URI="s3://${DATA_BUCKET}/artifacts/training-inputs/${COMMIT_SHA}/"
+      - |
+        PART_KEYS=$(aws s3api list-objects-v2 \
+          --bucket "${DATA_BUCKET}" \
+          --prefix "features/customers/part-" \
+          --query "Contents[?ends_with(Key, '.parquet')].Key" \
+          --output text)
+        if [ -z "$PART_KEYS" ] || [ "$PART_KEYS" = "None" ]; then
+          echo "No root-level Parquet feature files found under s3://${DATA_BUCKET}/features/customers/"
+          exit 1
+        fi
+        for KEY in $PART_KEYS; do
+          PART_NAME=${KEY##*/}
+          aws s3 cp "s3://${DATA_BUCKET}/${KEY}" \
+            "${TRAINING_DATA_URI}${PART_NAME}"
+        done
+        echo "Curated training data: ${TRAINING_DATA_URI}"
+
       # ── Upsert the SageMaker Pipeline ──────────────────────────────────
       # This is what used to be missing. The pipeline named here was started
       # by the old buildspec but was never defined by anything in the repo,
@@ -160,7 +182,9 @@ phases:
         EXECUTION_ARN=$(aws sagemaker start-pipeline-execution \
           --pipeline-name ${PIPELINE_NAME} \
           --pipeline-execution-display-name "codebuild-${COMMIT_SHA}" \
-          --pipeline-parameters "Name=CommitSha,Value=${COMMIT_SHA}" \
+          --pipeline-parameters \
+            "Name=CommitSha,Value=${COMMIT_SHA}" \
+            "Name=InputDataS3Uri,Value=${TRAINING_DATA_URI}" \
           --query "PipelineExecutionArn" \
           --output text)
         echo "Pipeline execution started: $EXECUTION_ARN"

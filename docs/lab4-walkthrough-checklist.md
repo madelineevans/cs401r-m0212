@@ -18,8 +18,9 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Existing feature files were copied to a temporary local channel for a preliminary trainer run. One timestamped offline-store `.txt` marker failed to copy because Windows disallows `:` in filenames; the trainer reads Parquet/CSV and ignores that marker.
 - [x] Lab 2 infrastructure is restored; Terraform plan is clean. Feature job succeeded on 2026-10-31, and refreshed raw, processed, and root feature files are downloaded into gitignored `data/` folders.
 - [x] `ml.m5.large` spot-training quota is now 4 in `us-east-1`.
+- [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection is `AVAILABLE`.
+- [x] Deployed `northstar-cicd`. Its first automatic run passed pre-build tests but the SageMaker training step failed because the broad feature prefix included a malformed nested Feature Store marker key. No model was registered. The build now curates root Parquet parts into a commit-specific training prefix; awaiting the next run.
 - [x] Local `tests/test_data.py` run against refreshed outputs: 28 passed, including schema, transaction grain, leakage, bounds, freshness under 48 hours, and consistency checks.
-- [ ] Lab 4-specific CI resources (versioned artifacts bucket, GitHub connection, and `northstar-cicd` stack) have not been created.
 
 ## 1. Finish Task 1 and local model implementation
 
@@ -51,8 +52,8 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 ## 3. CI/CD pipeline and failure demonstration (30 points)
 
 - [ ] Document the five logical phases in order: Source → Test → Build → Evaluate → Register. The reference CodePipeline has Source, Build, and ManualApproval stages; map phases to stages rather than creating one stage per phase.
-- [ ] Push the completed code to `main` before deploying `pipeline.yaml`; stack creation triggers a run immediately.
-- [ ] Deploy with `CAPABILITY_NAMED_IAM`; obtain a green run that trains through `churn_model.train()`, passes gates, and registers a `PendingManualApproval` package.
+- [x] Pushed the initial Lab 4 implementation to `main` before deploying `pipeline.yaml`; stack creation triggered a run immediately.
+- [ ] After the training-input fix is pushed, obtain a green run that trains through `churn_model.train()`, passes gates, and registers a `PendingManualApproval` package. The stack was deployed with `CAPABILITY_NAMED_IAM`.
 - [ ] Approve the first green package so the champion regression test can compare against it on the later green run.
 - [ ] Confirm the failure alarm starts in OK; record the BEFORE snapshot.
 - [ ] Push a deliberately failing test. Confirm failure in `PRE_BUILD`, no model registration, alarm state ALARM, successful SNS action, and delivery to a confirmed subscription.

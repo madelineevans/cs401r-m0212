@@ -20,7 +20,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] `ml.m5.large` spot-training quota is now 4 in `us-east-1`.
 - [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection is `AVAILABLE`.
 - [x] Deployed `northstar-cicd`. The first run exposed a malformed nested Feature Store marker key; the second run used the curated commit-specific Parquet prefix and training succeeded. Registration then exposed missing scoped Model Registry permissions on `MLEngineer`; the Terraform policy is now updated and applied. A third manual run on `cdcb7827` passed training, registration, and CodeBuild gates; package v5 and the CodePipeline approval action are now approved.
-- [ ] Automatic push trigger still needs verification: pushes `e8ad798` and `cdcb782` did not create executions. An explicit V2 `GitHubSource` push trigger for `GitHubBranch` has been added to `pipeline.yaml` locally but is not deployed yet.
+- [ ] Automatic push trigger still needs verification: explicit V2 `GitHubSource` push trigger for `main` is deployed and appears in `get-pipeline`, but push `4c1062f` did not start an execution. The deliberate-failure push will test it again.
 - [x] Local `tests/test_data.py` run against refreshed outputs: 28 passed, including schema, transaction grain, leakage, bounds, freshness under 48 hours, and consistency checks.
 
 ## 1. Finish Task 1 and local model implementation
@@ -54,9 +54,10 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 
 - [ ] Document the five logical phases in order: Source → Test → Build → Evaluate → Register. The reference CodePipeline has Source, Build, and ManualApproval stages; map phases to stages rather than creating one stage per phase.
 - [x] Pushed the initial Lab 4 implementation to `main` before deploying `pipeline.yaml`; stack creation triggered a run immediately.
-- [x] After the training-input and IAM fixes were pushed, a green run trained through `churn_model.train()`, passed the metric/fairness gates, and registered version 5. The CodePipeline approval action and SageMaker package are now both approved. The next green run must verify the champion regression check, which skipped on this run because no Approved champion existed yet.
+- [x] After the training-input and IAM fixes were pushed, a green run trained through `churn_model.train()`, passed the metric/fairness gates, and registered version 5. Package v5 is Approved and serves as champion.
 - [x] Set model package v5 to `Approved` in SageMaker Model Registry. AWS confirms it can serve as the champion for the later regression check.
-- [ ] Confirm the failure alarm starts in OK; record the BEFORE snapshot.
+- [x] Later green run on commit `4c1062f` passed the champion regression test: champion v5 AUC=0.7835, candidate AUC=0.7835. It registered package v6 as `PendingManualApproval`; the CodePipeline approval action succeeded.
+- [x] Confirm failure alarm starts in OK; before snapshot recorded in `docs/lab4-pipeline-runs.txt`. SNS email subscription is confirmed.
 - [ ] Push a deliberately failing test. Confirm failure in `PRE_BUILD`, no model registration, alarm state ALARM, successful SNS action, and delivery to a confirmed subscription.
 - [ ] Save the failed build log and received alarm email screenshot (showing received time); record AFTER FAILED RUN.
 - [ ] Revert the deliberate test and push. Confirm the build succeeds, alarm returns to OK, and the newest package is `PendingManualApproval`; record AFTER REVERT.
@@ -64,12 +65,12 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 
 ## 4. MLOps configuration and maturity assessment (40 points)
 
-- [ ] Create/update `docs/lab4-xops-assessment.md` with `## Pipeline Stage Mapping`.
-- [ ] Add `## Champion-Challenger` with a numeric, binary replacement criterion.
-- [ ] Add `## Retraining Triggers` with an automatable schedule and an automatable performance trigger; name the AWS service for each.
+- [x] Create `docs/lab4-xops-assessment.md` with `## Pipeline Stage Mapping`.
+- [x] Add `## Champion-Challenger` with a numeric, binary replacement criterion.
+- [x] Add `## Retraining Triggers` with an automatable schedule and an automatable performance trigger; name the AWS service for each. Both are clearly marked as proposals, not deployed.
 - [x] Document four finished MLflow App runs with differing hyperparameters and metrics, including the App tracking URI, in `docs/lab4-mlflow-runs.txt`. These existing runs were created 2026-10-13; create new Lab 4-dated runs only if the instructor requires them.
 - [x] Add training data S3 URI and timestamp, full code commit SHA, and evaluation metrics to approved package v5's customer metadata; save the full description as `docs/lab4-model-package.json`. Future builds now attach these fields in `post_build`.
-- [ ] Write about 400 words under `## DataOps Maturity` and `## MLOps Maturity`, each with current level, concrete repository evidence, a specific gap to the next level, and one actionable priority investment.
+- [ ] Review the ~400-word draft under `## DataOps Maturity` and `## MLOps Maturity`; personalize the maturity ratings and priorities.
 
 ## 5. Capture evidence, teardown, and submit
 

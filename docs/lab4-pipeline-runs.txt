@@ -46,7 +46,34 @@ Evaluation metrics for commit cdcb7827:
   northstar-churn-models/5 — PendingManualApproval.
 - The successful build returned the alarm to OK.
 
-Trigger behavior still needs investigation: pushes of e8ad798 and cdcb782 did
-not start executions automatically. The source action is configured with
-DetectChanges=true, but both retries above were manually started. Do not count
-push-to-test automation as verified yet.
+Run 4 — champion-regression verification
+----------------------------------------
+CodePipeline execution: 145533a2-b75e-419c-9edf-44a9fba8ba0f
+Source revision: 4c1062f702bc0960218d9a3092bc378a64145357
+Trigger: StartPipelineExecution (manual; the push did not start a run)
+CodeBuild: northstar-ci:6bb79aba-f438-4e34-8e7c-e98cb429c1a0 — SUCCEEDED
+SageMaker execution: i9odokhr11q6 — Succeeded
+CodePipeline ManualApproval action: Succeeded
+Registry package version 6: PendingManualApproval; version 5 remains the
+Approved champion.
+
+Evaluation metrics for commit 4c1062f:
+- AUC: 0.7835; recency-only baseline AUC: 0.7208
+- Precision at top 10%: 0.7267; recall at top 10%: 0.3303
+- AUC-lift 95% CI: [0.0427, 0.0823]
+- Champion regression test passed. Build warning: champion v5 AUC=0.7835;
+  candidate AUC=0.7835.
+- Metrics object: s3://northstar-dev-data-722160254691/artifacts/evaluations/
+  4c1062f7/evaluation_metrics.json
+- Registry metadata records the curated training input URI, source timestamp,
+  full commit SHA, metrics URI, and scalar evaluation metrics.
+
+Push-trigger status: an explicit V2 GitConfiguration trigger is deployed and
+AWS reports CodeStarSourceConnection, action GitHubSource, branch main. The
+push of 4c1062f702bc0960218d9a3092bc378a64145357 still did not start an
+execution; Run 4 was started manually. The deliberate-failure push is the next
+opportunity to verify the trigger while also exercising the failure alarm.
+
+Alarm before failure demonstration: northstar-ci-build-failure was OK at
+2026-10-31T14:25:22-06:00. SNS email subscription is confirmed on the topic
+northstar-model-approvals.

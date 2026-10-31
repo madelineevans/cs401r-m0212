@@ -19,7 +19,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Lab 2 infrastructure is restored; Terraform plan is clean. Feature job succeeded on 2026-10-31, and refreshed raw, processed, and root feature files are downloaded into gitignored `data/` folders.
 - [x] `ml.m5.large` spot-training quota is now 4 in `us-east-1`.
 - [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection is `AVAILABLE`.
-- [x] Deployed `northstar-cicd`. Its first automatic run passed pre-build tests but the SageMaker training step failed because the broad feature prefix included a malformed nested Feature Store marker key. No model was registered. The build now curates root Parquet parts into a commit-specific training prefix; awaiting the next run.
+- [x] Deployed `northstar-cicd`. The first run exposed a malformed nested Feature Store marker key; the second run used the curated commit-specific Parquet prefix and training succeeded. Registration then exposed missing scoped Model Registry permissions on `MLEngineer`; the Terraform policy is now updated and applied.
 - [x] Local `tests/test_data.py` run against refreshed outputs: 28 passed, including schema, transaction grain, leakage, bounds, freshness under 48 hours, and consistency checks.
 
 ## 1. Finish Task 1 and local model implementation

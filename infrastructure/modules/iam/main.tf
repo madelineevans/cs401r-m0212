@@ -11,6 +11,7 @@
 
 data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
+data "aws_region" "current" {}
 
 locals {
   bucket_name = "${var.project}-${var.environment}-data-${data.aws_caller_identity.current.account_id}"
@@ -73,6 +74,25 @@ resource "aws_iam_policy" "ml_engineer" {
           "arn:${data.aws_partition.current.partition}:s3:::${local.bucket_name}/features/*",
           "arn:${data.aws_partition.current.partition}:s3:::${local.bucket_name}/artifacts/*"
         ]
+      },
+      {
+        Sid    = "RegisterChurnModelPackageGroup"
+        Effect = "Allow"
+        Action = [
+          "sagemaker:CreateModelPackageGroup",
+          "sagemaker:DescribeModelPackageGroup",
+          "sagemaker:ListModelPackages"
+        ]
+        Resource = "arn:${data.aws_partition.current.partition}:sagemaker:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:model-package-group/${var.project}-churn-models"
+      },
+      {
+        Sid    = "RegisterChurnModelPackageVersions"
+        Effect = "Allow"
+        Action = [
+          "sagemaker:CreateModelPackage",
+          "sagemaker:DescribeModelPackage"
+        ]
+        Resource = "arn:${data.aws_partition.current.partition}:sagemaker:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:model-package/${var.project}-churn-models/*"
       },
       {
         Sid      = "ListApprovedPrefixes"

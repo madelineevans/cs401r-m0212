@@ -112,3 +112,29 @@ Evaluation metrics:
 
 CodePipeline ManualApproval action succeeded. SageMaker package version 6 is
 PendingManualApproval; approved champion version 5 remains unchanged.
+
+Recovery run after reverting the temporary failure
+==================================================
+Pipeline execution: 7e896f6c-864f-446f-a44a-4af639a10fd4
+CodeBuild: northstar-ci:8de419c4-c67b-470f-96cd-4e4123aef26a — SUCCEEDED
+Source commit: 753a91133a591250df54e95b0588f04aabad20fd
+SageMaker execution: 3xdzwo2p7usm — Succeeded
+Full log: CloudWatch Logs /aws/codebuild/northstar-ci, stream
+8de419c4-c67b-470f-96cd-4e4123aef26a
+
+tests/test_model.py::TestStoredMetricsGate::test_candidate_not_worse_than_approved_champion PASSED
+UserWarning: champion v5 auc=0.7835; candidate auc=0.7835
+
+Evaluation metrics:
+  auc_roc: 0.7835
+  baseline_auc_roc: 0.7208
+  precision_top10: 0.7267
+  recall_top10: 0.3303
+  auc_lift_ci_low: 0.0427
+  auc_lift_ci_high: 0.0823
+  n_val_samples: 3000
+  positive_rate_val: 0.22
+
+Registry package version 8: PendingManualApproval. Package version 5 remains
+the Approved champion. The CloudWatch failure alarm returned to OK at
+2026-10-31T16:14:22-06:00.

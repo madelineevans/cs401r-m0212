@@ -61,7 +61,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Deliberate failure commit `470506f` failed in `PRE_BUILD`; no SageMaker run/package was started. Alarm entered ALARM and CloudWatch confirmed successful SNS publish to the confirmed subscription.
 - [x] Save failed build excerpt in `docs/lab4-build-failed.log` and before/after details in `docs/lab4-failure-demo.txt`.
 - [x] Save the received alarm email screenshot showing its received time to `docs/lab4-alarm-email.png` (received 4:00 PM).
-- [ ] Revert the deliberate test and push. Confirm the build succeeds, alarm returns to OK, and the newest package is `PendingManualApproval`; record AFTER REVERT.
+- [x] Revert the deliberate test and push. Recovery commit `753a911` passed CodeBuild, the alarm returned to OK, and new package v8 is `PendingManualApproval`; recovery evidence is recorded.
 - [ ] Keep both the failure commit and revert in `main` history.
 
 ## 4. MLOps configuration and maturity assessment (40 points)
@@ -77,11 +77,11 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 
 Before deleting resources, save and review:
 
-- [ ] `docs/lab4-build-green.log`
-- [ ] `docs/lab4-build-failed.log`
+- [x] `docs/lab4-build-green.log`
+- [x] `docs/lab4-build-failed.log`
 - [x] `docs/lab4-pipeline-runs.txt`
-- [ ] `docs/lab4-failure-demo.txt`
-- [ ] `docs/lab4-alarm-email.png`
+- [x] `docs/lab4-failure-demo.txt`
+- [x] `docs/lab4-alarm-email.png`
 - [x] `docs/lab4-model-registry.json`
 - [x] `docs/lab4-model-package.json`
 - [x] `docs/lab4-mlflow-runs.txt`

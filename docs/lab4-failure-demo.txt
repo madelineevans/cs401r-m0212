@@ -23,8 +23,15 @@ FAILURE
   at 4:00 PM; shows the alarm changed from OK to ALARM).
 
 AFTER REVERT
-- Pending: revert the temporary failure test, push, confirm CodeBuild succeeds,
-  alarm returns to OK, and the new model package remains PendingManualApproval.
+- Revert/cleanup commit: 753a91133a591250df54e95b0588f04aabad20fd
+- Recovery CodePipeline execution: 7e896f6c-864f-446f-a44a-4af639a10fd4
+- Recovery CodeBuild: northstar-ci:8de419c4-c67b-470f-96cd-4e4123aef26a — SUCCEEDED
+- SageMaker execution: 3xdzwo2p7usm — Succeeded; package v8 is
+  PendingManualApproval and v5 remains the Approved champion.
+- Champion regression passed: v5 AUC=0.7835; candidate AUC=0.7835.
+- Alarm returned to OK at 2026-10-31 16:14:22 -06:00.
+- The CodePipeline ManualApproval action for v8 is awaiting review. This does
+  not change the SageMaker package approval status.
 
 Note: An earlier, incorrectly scoped demo test was not part of the PRE_BUILD
 command. That run was stopped after SageMaker had already started and completed;

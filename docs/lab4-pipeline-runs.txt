@@ -95,3 +95,19 @@ not included in the explicit PRE_BUILD pytest commands. CodeBuild was stopped
 in BUILD after SageMaker execution gm8hogpfainv completed. Its package v7 was
 rejected because the CodeBuild model gates did not run. This is not the rubric
 failure evidence; use Run 5.
+
+Run 6 — recovery after revert
+-----------------------------
+Revert/cleanup source revision: 753a91133a591250df54e95b0588f04aabad20fd
+CodePipeline execution: 7e896f6c-864f-446f-a44a-4af639a10fd4
+Trigger: StartPipelineExecution (manual; push did not start an execution)
+CodeBuild: northstar-ci:8de419c4-c67b-470f-96cd-4e4123aef26a — SUCCEEDED
+SageMaker execution: 3xdzwo2p7usm — Succeeded
+Registry package v8: PendingManualApproval. Version 5 remains the Approved
+champion; v7 is Rejected.
+Champion regression test passed: champion v5 AUC=0.7835; candidate AUC=0.7835.
+Other evaluation metrics: AUC 0.7835; baseline AUC 0.7208; precision@10
+0.7267; recall@10 0.3303; AUC-lift 95% CI [0.0427, 0.0823].
+Alarm returned to OK at 2026-10-31T16:14:22-06:00.
+The CodePipeline ManualApproval action for this run is still awaiting review;
+this action does not change the SageMaker package approval status.

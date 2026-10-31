@@ -109,5 +109,5 @@ Champion regression test passed: champion v5 AUC=0.7835; candidate AUC=0.7835.
 Other evaluation metrics: AUC 0.7835; baseline AUC 0.7208; precision@10
 0.7267; recall@10 0.3303; AUC-lift 95% CI [0.0427, 0.0823].
 Alarm returned to OK at 2026-10-31T16:14:22-06:00.
-The CodePipeline ManualApproval action for this run is still awaiting review;
-this action does not change the SageMaker package approval status.
+The CodePipeline ManualApproval action later succeeded. SageMaker package v8
+remains PendingManualApproval until separately approved in Model Registry.

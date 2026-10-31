@@ -58,6 +58,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Set model package v5 to `Approved` in SageMaker Model Registry. AWS confirms it can serve as the champion for the later regression check.
 - [x] Later green run on commit `4c1062f` passed the champion regression test: champion v5 AUC=0.7835, candidate AUC=0.7835. It registered package v6 as `PendingManualApproval`; the CodePipeline approval action succeeded.
 - [x] Confirm failure alarm starts in OK; before snapshot recorded in `docs/lab4-pipeline-runs.txt`. SNS email subscription is confirmed.
+- [x] Recovery run registered package v8 as `PendingManualApproval`; the CodePipeline approval action succeeded, while SageMaker registry approval remains separate.
 - [x] Deliberate failure commit `470506f` failed in `PRE_BUILD`; no SageMaker run/package was started. Alarm entered ALARM and CloudWatch confirmed successful SNS publish to the confirmed subscription.
 - [x] Save failed build excerpt in `docs/lab4-build-failed.log` and before/after details in `docs/lab4-failure-demo.txt`.
 - [x] Save the received alarm email screenshot showing its received time to `docs/lab4-alarm-email.png` (received 4:00 PM).

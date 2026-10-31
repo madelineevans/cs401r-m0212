@@ -30,8 +30,8 @@ AFTER REVERT
   PendingManualApproval and v5 remains the Approved champion.
 - Champion regression passed: v5 AUC=0.7835; candidate AUC=0.7835.
 - Alarm returned to OK at 2026-10-31 16:14:22 -06:00.
-- The CodePipeline ManualApproval action for v8 is awaiting review. This does
-  not change the SageMaker package approval status.
+- The CodePipeline ManualApproval action for v8 succeeded. It does not change
+  the SageMaker package approval status, which remains PendingManualApproval.
 
 Note: An earlier, incorrectly scoped demo test was not part of the PRE_BUILD
 command. That run was stopped after SageMaker had already started and completed;

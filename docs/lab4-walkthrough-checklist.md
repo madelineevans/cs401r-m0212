@@ -20,7 +20,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] `ml.m5.large` spot-training quota is now 4 in `us-east-1`.
 - [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection `401r-Lab4` is `AVAILABLE` in `us-east-1`.
 - [x] Deployed `northstar-cicd`. The first run exposed a malformed nested Feature Store marker key; the second run used the curated commit-specific Parquet prefix and training succeeded. Registration then exposed missing scoped Model Registry permissions on `MLEngineer`; the Terraform policy is now updated and applied. A third manual run on `cdcb7827` passed training, registration, and CodeBuild gates; package v5 and the CodePipeline approval action are now approved.
-- [ ] Automatic push trigger still needs verification: explicit V2 `GitHubSource` push trigger for `main` is deployed and appears in `get-pipeline`. Earlier pushes did not start executions; CloudFormation now points the source action to the newly available `401r-Lab4` connection. Verify with the next main-branch push.
+- [x] Automatic push trigger verified: V2 `GitHubSource` on `main` started execution `c1fe878b` as `WebhookV2` using the available `401r-Lab4` connection.
 - [x] Local `tests/test_data.py` run against refreshed outputs: 28 passed, including schema, transaction grain, leakage, bounds, freshness under 48 hours, and consistency checks.
 
 ## 1. Finish Task 1 and local model implementation
@@ -59,8 +59,10 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Later green run on commit `4c1062f` passed the champion regression test: champion v5 AUC=0.7835, candidate AUC=0.7835. It registered package v6 as `PendingManualApproval`; the CodePipeline approval action succeeded.
 - [x] Confirm failure alarm starts in OK; before snapshot recorded in `docs/lab4-pipeline-runs.txt`. SNS email subscription is confirmed.
 - [x] Recovery run registered package v8 as `PendingManualApproval`; the CodePipeline approval action succeeded, while SageMaker registry approval remains separate.
+- [x] Verify automatic push trigger using connection `401r-Lab4`: commit `32a2b35` triggered CodePipeline as `WebhookV2`; its CodeBuild and SageMaker runs succeeded and registered package v9.
+- [ ] Review and approve the pending CodePipeline `ReviewModelMetrics` action for package v9. This action does not change the SageMaker package's `PendingManualApproval` status.
 - [x] Deliberate failure commit `470506f` failed in `PRE_BUILD`; no SageMaker run/package was started. Alarm entered ALARM and CloudWatch confirmed successful SNS publish to the confirmed subscription.
-- [x] Save failed build excerpt in `docs/lab4-build-failed.log` and before/after details in `docs/lab4-failure-demo.txt`.
+- [x] Save the full failed CodeBuild log in `docs/lab4-build-failed.log` and before/after details in `docs/lab4-failure-demo.txt`.
 - [x] Save the received alarm email screenshot showing its received time to `docs/lab4-alarm-email.png` (received 4:00 PM).
 - [x] Revert the deliberate test and push. Recovery commit `753a911` passed CodeBuild, the alarm returned to OK, and new package v8 is `PendingManualApproval`; recovery evidence is recorded.
 - [x] Keep both the deliberate-failure commit `470506f` and its revert `c521920` in `main` history.
@@ -71,19 +73,19 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Add `## Champion-Challenger` with a numeric, binary replacement criterion.
 - [x] Add `## Retraining Triggers` with an automatable schedule and an automatable performance trigger; name the AWS service for each. Both are clearly marked as proposals, not deployed.
 - [x] Document four finished MLflow App runs with differing hyperparameters and metrics, including the App tracking URI, in `docs/lab4-mlflow-runs.txt`. These existing runs were created 2026-10-13; create new Lab 4-dated runs only if the instructor requires them.
-- [x] Add training data S3 URI and timestamp, full code commit SHA, and evaluation metrics to the approved v5 package and newest v8 candidate; `docs/lab4-model-package.json` contains the full v8 description. Future builds attach these fields in `post_build`.
+- [x] Add training data S3 URI and timestamp, full code commit SHA, and evaluation metrics to the approved v5 package and newest v9 candidate; `docs/lab4-model-package.json` contains the full v9 description. Future builds attach these fields in `post_build`.
 - [ ] Review the ~400-word draft under `## DataOps Maturity` and `## MLOps Maturity`; personalize the maturity ratings and priorities.
 
 ## 5. Capture evidence, teardown, and submit
 
 Before deleting resources, save and review:
 
-- [x] `docs/lab4-build-green.log`
+- [x] Full final push-triggered green CodeBuild log in `docs/lab4-build-green.log`
 - [x] `docs/lab4-build-failed.log`
 - [x] `docs/lab4-pipeline-runs.txt`
 - [x] `docs/lab4-failure-demo.txt`
 - [x] `docs/lab4-alarm-email.png`
-- [x] `docs/lab4-model-registry.json`
+- [x] `docs/lab4-model-registry.json` (v9 candidate, v5 champion, v7 rejected)
 - [x] `docs/lab4-model-package.json`
 - [x] `docs/lab4-mlflow-runs.txt`
 - [ ] `docs/lab4-xops-assessment.md`

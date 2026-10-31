@@ -68,11 +68,10 @@ Evaluation metrics for commit 4c1062f:
 - Registry metadata records the curated training input URI, source timestamp,
   full commit SHA, metrics URI, and scalar evaluation metrics.
 
-Push-trigger status: an explicit V2 GitConfiguration trigger is deployed and
-AWS reports CodeStarSourceConnection, action GitHubSource, branch main. The
-push of 4c1062f702bc0960218d9a3092bc378a64145357 still did not start an
-execution; Run 4 was started manually. The deliberate-failure push is the next
-opportunity to verify the trigger while also exercising the failure alarm.
+Push-trigger status: the pipeline uses GitHub CodeConnections `401r-Lab4` in
+us-east-1 and a V2 push trigger filtered to `main`. The initial runs used an
+older connection and required manual starts. Run 7 below verifies the
+replacement connection with a real `WebhookV2` trigger.
 
 Alarm before failure demonstration: northstar-ci-build-failure was OK at
 2026-10-31T14:25:22-06:00. SNS email subscription is confirmed on the topic
@@ -88,7 +87,8 @@ The intentional test in `tests/test_features.py` failed in PRE_BUILD:
 1 failed, 19 passed. No SageMaker execution or package registration occurred
 in this corrected failure run.
 Alarm entered ALARM at 2026-10-31T16:00:22-06:00. CloudWatch history confirms
-the SNS action succeeded. The email screenshot is still to be saved.
+the SNS action succeeded. The received email screenshot is saved as
+`docs/lab4-alarm-email.png`.
 
 Earlier stopped attempt: commit 7289889 contained a standalone test that was
 not included in the explicit PRE_BUILD pytest commands. CodeBuild was stopped
@@ -116,4 +116,25 @@ After Run 6, the CodePipeline stack was updated to use GitHub connection
 `401r-Lab4` (available, us-east-1), ARN
 arn:aws:codeconnections:us-east-1:722160254691:connection/501068de-2fbf-4df9-b619-00b6489676dd.
 AWS reports the pipeline remains V2 with a `GitHubSource` push trigger filtered
-to `main`. Automatic trigger verification is pending the next push.
+to `main`.
+
+Run 7 — automatic push trigger and final green run
+-------------------------------------------------
+Source commit: 32a2b35f1017285a4ddaf4f4f8eafd3cb97b4e1a
+CodePipeline execution: c1fe878b-341b-46cd-aa54-21af4233a5ba
+Trigger: WebhookV2 — automatically started by the push to `main`
+CodeBuild: northstar-ci:6e9b8393-2f96-4e4f-8388-61fc9bdcf69d — SUCCEEDED
+SageMaker execution: fu3gatmppp12 — Succeeded
+CodePipeline `ReviewModelMetrics` action: InProgress when evidence was captured;
+the candidate package is pending this human review.
+Registry package v9: PendingManualApproval; package v5 remains the Approved
+champion and package v7 remains Rejected.
+
+Evaluation metrics for commit 32a2b35:
+- AUC: 0.7835; recency-only baseline AUC: 0.7208
+- Precision at top 10%: 0.7267; recall at top 10%: 0.3303
+- AUC-lift 95% CI: [0.0427, 0.0823], excluding zero
+- Champion regression test passed: champion v5 AUC=0.7835; candidate AUC=0.7835.
+- Registry metadata records the full commit SHA, training-data S3 URI and
+  timestamp, metrics URI, and scalar metrics.
+- Full CodeBuild logs are saved in `docs/lab4-build-green.log`.

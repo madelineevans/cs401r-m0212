@@ -4,7 +4,7 @@
 
 | Logical phase | Implementation |
 |---|---|
-| Source | CodePipeline `GitHubSource` uses the GitHub CodeConnections connection for `main`. A V2 branch push trigger is configured in `pipeline.yaml`. Its automatic firing still needs a successful push-triggered run. |
+| Source | CodePipeline `GitHubSource` uses the available `401r-Lab4` GitHub CodeConnections connection in us-east-1. A V2 push trigger filtered to `main` was verified by the WebhookV2 run for commit `32a2b35`. |
 | Test | CodeBuild `PRE_BUILD` installs requirements and runs the repository pytest suites. A failed test exits before training or registration. |
 | Build | CodeBuild stages the commit-specific Parquet training input and invokes the SageMaker churn pipeline. SageMaker trains with managed spot capacity. |
 | Evaluate | The trainer writes evaluation metrics; CodeBuild enforces precision@10 ≥ 0.50, recall@10 ≥ 0.25, and positive 95% AUC lift confidence interval. Fairness gaps over 10 percentage points warn without blocking. |
@@ -28,4 +28,4 @@ The newest `Approved` package is the champion. Approve a candidate only when its
 
 **Current level: 2/4.** Training is implemented behind a stable `train(df, seed=42)` contract and runs through a SageMaker Pipeline using managed spot capacity. The CI job tests the model interface, evaluates precision and recall at the top 10%, and requires the 95% AUC-lift interval over a recency baseline to exclude zero. Fairness checks report loyalty-tier recall gaps as warnings. Passing models are versioned in SageMaker Model Registry as pending approval; approved package v5 now provides a champion for the regression gate. Four finished MLflow App runs preserve earlier experiments with different hyperparameters and metrics.
 
-**Gap to Level 3:** reliable, monitored automation after registration is not complete. Model promotion still requires a person, the newly configured push trigger has not yet been proven by a push, and production drift monitoring and automatic retraining are proposals rather than deployed controls. **Top priority investment:** verify the push-trigger path, add SageMaker Model Monitor with CloudWatch alarms, and connect a weekly EventBridge schedule plus a monitor-driven EventBridge rule to the SageMaker Pipeline. Keep registry approval as the deployment gate until monitoring and rollback behavior are demonstrated.
+**Gap to Level 3:** reliable, monitored automation after registration is not complete. Model promotion still requires a person, and production drift monitoring and automatic retraining are proposals rather than deployed controls. **Top priority investment:** add SageMaker Model Monitor with CloudWatch alarms, then connect a weekly EventBridge schedule and a monitor-driven EventBridge rule to the SageMaker Pipeline. Keep registry approval as the deployment gate until monitoring and rollback behavior are demonstrated.

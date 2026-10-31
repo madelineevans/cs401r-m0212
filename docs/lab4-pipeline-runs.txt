@@ -125,8 +125,7 @@ CodePipeline execution: c1fe878b-341b-46cd-aa54-21af4233a5ba
 Trigger: WebhookV2 — automatically started by the push to `main`
 CodeBuild: northstar-ci:6e9b8393-2f96-4e4f-8388-61fc9bdcf69d — SUCCEEDED
 SageMaker execution: fu3gatmppp12 — Succeeded
-CodePipeline `ReviewModelMetrics` action: InProgress when evidence was captured;
-the candidate package is pending this human review.
+CodePipeline `ReviewModelMetrics` action: Succeeded after human review.
 Registry package v9: PendingManualApproval; package v5 remains the Approved
 champion and package v7 remains Rejected.
 

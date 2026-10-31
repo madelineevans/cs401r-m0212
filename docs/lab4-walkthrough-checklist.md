@@ -60,7 +60,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Confirm failure alarm starts in OK; before snapshot recorded in `docs/lab4-pipeline-runs.txt`. SNS email subscription is confirmed.
 - [x] Recovery run registered package v8 as `PendingManualApproval`; the CodePipeline approval action succeeded, while SageMaker registry approval remains separate.
 - [x] Verify automatic push trigger using connection `401r-Lab4`: commit `32a2b35` triggered CodePipeline as `WebhookV2`; its CodeBuild and SageMaker runs succeeded and registered package v9.
-- [ ] Review and approve the pending CodePipeline `ReviewModelMetrics` action for package v9. This action does not change the SageMaker package's `PendingManualApproval` status.
+- [x] Human review approved the CodePipeline `ReviewModelMetrics` action for package v9. This action does not change the SageMaker package's `PendingManualApproval` status.
 - [x] Deliberate failure commit `470506f` failed in `PRE_BUILD`; no SageMaker run/package was started. Alarm entered ALARM and CloudWatch confirmed successful SNS publish to the confirmed subscription.
 - [x] Save the full failed CodeBuild log in `docs/lab4-build-failed.log` and before/after details in `docs/lab4-failure-demo.txt`.
 - [x] Save the received alarm email screenshot showing its received time to `docs/lab4-alarm-email.png` (received 4:00 PM).
@@ -74,7 +74,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Add `## Retraining Triggers` with an automatable schedule and an automatable performance trigger; name the AWS service for each. Both are clearly marked as proposals, not deployed.
 - [x] Document four finished MLflow App runs with differing hyperparameters and metrics, including the App tracking URI, in `docs/lab4-mlflow-runs.txt`. These existing runs were created 2026-10-13; create new Lab 4-dated runs only if the instructor requires them.
 - [x] Add training data S3 URI and timestamp, full code commit SHA, and evaluation metrics to the approved v5 package and newest v9 candidate; `docs/lab4-model-package.json` contains the full v9 description. Future builds attach these fields in `post_build`.
-- [ ] Review the ~400-word draft under `## DataOps Maturity` and `## MLOps Maturity`; personalize the maturity ratings and priorities.
+- [x] Review the DataOps/MLOps maturity assessment against the rubric and current evidence; it identifies both levels as 2/4 and names evidence, gaps, and priority investments.
 
 ## 5. Capture evidence, teardown, and submit
 
@@ -88,7 +88,7 @@ Before deleting resources, save and review:
 - [x] `docs/lab4-model-registry.json` (v9 candidate, v5 champion, v7 rejected)
 - [x] `docs/lab4-model-package.json`
 - [x] `docs/lab4-mlflow-runs.txt`
-- [ ] `docs/lab4-xops-assessment.md`
+- [x] `docs/lab4-xops-assessment.md` (stage mapping, champion policy, retraining proposals, maturity levels, evidence, gaps, and priorities)
 
 Then:
 

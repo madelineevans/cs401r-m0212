@@ -1,0 +1,52 @@
+Lab 4 pipeline run notes (us-east-1)
+====================================
+
+Pipeline: northstar-pipeline
+SageMaker pipeline: northstar-churn-pipeline
+Repository: madelineevans/cs401r-m0212, branch main
+
+Run 1 — stack-create execution
+------------------------------
+CodePipeline execution: 79c4fe27-2692-4f9c-84ae-7529b0434e33
+Source revision: c2b436f1c0a423ce83b95ddd6f188d4ffbdc3701
+Trigger: CreatePipeline
+Result: Failed in SageMaker TrainChurnModel. The S3 prefix included a nested
+Feature Store marker key with a malformed double slash. No model package was
+registered. The CodeBuild FailedBuilds alarm entered ALARM.
+
+Run 2 — manual retry after training-input fix
+----------------------------------------------
+CodePipeline execution: 0c746079-470e-4c6e-be6f-f013c803cd85
+Source revision: e8ad7984f47ad3140f8fb6d748f492c7df3324f7
+Trigger: StartPipelineExecution
+SageMaker execution: xa7b98ejsqre
+Result: Training succeeded using a commit-specific prefix containing only the
+two root Parquet parts. RegisterChurnModel failed because the MLEngineer role
+lacked scoped CreateModelPackageGroup permission. No new package was registered.
+
+Run 3 — manual retry after IAM fix
+----------------------------------
+CodePipeline execution: e23e750b-3ed2-4ebf-b123-0284010aceb8
+Source revision: cdcb7827a6aafde848fee7aebcdd4d4814f39b11
+Trigger: StartPipelineExecution
+CodeBuild: northstar-ci:a3237b04-82df-4f4b-8be5-4d40775debae — SUCCEEDED
+SageMaker execution: yxcao76wuo1b — TrainChurnModel and RegisterChurnModel
+both Succeeded. Training used managed spot capacity; billable time was 57 s.
+The CodePipeline ManualApproval action and SageMaker package version 5 are
+now both Approved.
+
+Evaluation metrics for commit cdcb7827:
+- AUC: 0.7835; recency-only baseline AUC: 0.7208
+- Precision at top 10%: 0.7267 (gate >= 0.50)
+- Recall at top 10%: 0.3303 (gate >= 0.25)
+- AUC-lift 95% CI: [0.0427, 0.0823] (excludes zero)
+- Loyalty-tier top-10 recall warning: Bronze 0.4404 vs Gold 0.1538,
+  a 28.7 percentage-point gap. Warning only; it does not block the build.
+- Registry package: arn:aws:sagemaker:us-east-1:722160254691:model-package/
+  northstar-churn-models/5 — PendingManualApproval.
+- The successful build returned the alarm to OK.
+
+Trigger behavior still needs investigation: pushes of e8ad798 and cdcb782 did
+not start executions automatically. The source action is configured with
+DetectChanges=true, but both retries above were manually started. Do not count
+push-to-test automation as verified yet.

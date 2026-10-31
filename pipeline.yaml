@@ -352,9 +352,22 @@ Resources:
     Properties:
       Name: !Sub "${ProjectName}-pipeline"
       RoleArn: !GetAtt CodePipelineRole.Arn
+      PipelineType: V2
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactsBucket
+
+      # Explicit V2 trigger for pushes to the configured GitHub branch. The
+      # CodeStarSourceConnection action can detect changes by default, but our
+      # initial deployed pipeline did not start when commits were pushed.
+      Triggers:
+        - Provider: CodeStarSourceConnection
+          GitConfiguration:
+            SourceActionName: GitHubSource
+            Push:
+              - Branches:
+                  Includes:
+                    - !Ref GitHubBranch
 
       Stages:
 
@@ -372,7 +385,6 @@ Resources:
                 FullRepositoryId: !Sub "${GitHubOwner}/${GitHubRepo}"
                 BranchName: !Ref GitHubBranch
                 OutputArtifactFormat: CODE_ZIP
-                DetectChanges: true
               OutputArtifacts:
                 - Name: SourceArtifact
 

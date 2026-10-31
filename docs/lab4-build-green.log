@@ -1,0 +1,87 @@
+Green CodeBuild evidence
+Build: northstar-ci:a3237b04-82df-4f4b-8be5-4d40775debae
+Source commit: cdcb7827a6aafde848fee7aebcdd4d4814f39b11
+Selected test and metric lines; full log is in CloudWatch.
+tests/test_data.py::TestRawData::test_schema PASSED                      [  3%]
+	tests/test_data.py::TestRawData::test_row_count_plausible PASSED         [  7%]
+	tests/test_data.py::TestRawData::test_contains_defects_to_clean PASSED   [ 10%]
+	tests/test_data.py::TestRawData::test_contains_mixed_date_formats PASSED [ 14%]
+	tests/test_data.py::TestProcessedData::test_schema PASSED                [ 17%]
+	tests/test_data.py::TestProcessedData::test_no_null_customer_id PASSED   [ 21%]
+	tests/test_data.py::TestProcessedData::test_no_duplicate_transactions PASSED [ 25%]
+	tests/test_data.py::TestProcessedData::test_all_dates_parsed PASSED      [ 28%]
+	tests/test_data.py::TestProcessedData::test_no_null_order_value PASSED   [ 32%]
+	tests/test_data.py::TestProcessedData::test_order_value_in_range PASSED  [ 35%]
+	tests/test_data.py::TestProcessedData::test_customer_id_whitespace_trimmed PASSED [ 39%]
+	tests/test_data.py::TestProcessedData::test_channel_values_valid PASSED  [ 42%]
+	tests/test_data.py::TestProcessedData::test_transaction_grain_preserved PASSED [ 46%]
+	tests/test_data.py::TestFeatures::test_schema PASSED                     [ 50%]
+	tests/test_data.py::TestFeatures::test_one_row_per_customer PASSED       [ 53%]
+	tests/test_data.py::TestFeatures::test_no_nulls PASSED                   [ 57%]
+	tests/test_data.py::TestFeatures::test_all_tiers_present PASSED          [ 60%]
+	tests/test_data.py::TestFeatures::test_churn_label_binary PASSED         [ 64%]
+	tests/test_data.py::TestFeatures::test_churn_rate_plausible PASSED       [ 67%]
+	tests/test_data.py::TestFeatures::test_bounded_features_in_range PASSED  [ 71%]
+	tests/test_data.py::TestFeatures::test_non_negative_counts PASSED        [ 75%]
+	tests/test_data.py::TestFeatures::test_frequency_windows_are_monotonic PASSED [ 78%]
+	tests/test_data.py::TestFeatures::test_label_not_trivially_separable PASSED [ 82%]
+	tests/test_data.py::TestFeatures::test_recency_within_observation_window PASSED [ 85%]
+	tests/test_data.py::TestFeatures::test_time_features_use_only_pre_cutoff_transactions PASSED [ 89%]
+	tests/test_data.py::TestFeatures::test_latest_feature_event_time_is_under_48_hours_old PASSED [ 92%]
+	tests/test_data.py::TestConsistency::test_feature_customers_are_subset_of_processed PASSED [ 96%]
+	tests/test_data.py::TestConsistency::test_row_survival_rate PASSED       [100%]
+	tests/test_features.py::TestRecencyFeatures::test_days_since_last_purchase_correct PASSED [  5%]
+	tests/test_features.py::TestRecencyFeatures::test_recent_buyer_low_recency PASSED [ 10%]
+	tests/test_features.py::TestRecencyFeatures::test_no_negative_recency PASSED [ 15%]
+	tests/test_features.py::TestRecencyFeatures::test_customer_with_no_transactions_returns_sentinel PASSED [ 21%]
+	tests/test_features.py::TestFrequencyFeatures::test_frequency_90d_correct PASSED [ 26%]
+	tests/test_features.py::TestFrequencyFeatures::test_frequency_90d_excludes_older_transactions PASSED [ 31%]
+	tests/test_features.py::TestFrequencyFeatures::test_frequency_is_non_negative PASSED [ 36%]
+	tests/test_features.py::TestFrequencyFeatures::test_frequency_180d_gte_frequency_90d PASSED [ 42%]
+	tests/test_features.py::TestMonetaryFeatures::test_avg_basket_size_correct PASSED [ 47%]
+	tests/test_features.py::TestMonetaryFeatures::test_total_spend_90d_is_sum_not_average PASSED [ 52%]
+	tests/test_features.py::TestMonetaryFeatures::test_monetary_features_non_negative PASSED [ 57%]
+	tests/test_features.py::TestBehavioralFeatures::test_category_diversity_score_range PASSED [ 63%]
+	tests/test_features.py::TestBehavioralFeatures::test_single_category_buyer_has_low_diversity PASSED [ 68%]
+	tests/test_features.py::TestBehavioralFeatures::test_multi_category_buyer_has_high_diversity PASSED [ 73%]
+	tests/test_features.py::TestBehavioralFeatures::test_online_to_store_ratio_non_negative PASSED [ 78%]
+	tests/test_features.py::TestFullFeatureSet::test_all_required_features_present PASSED [ 84%]
+	tests/test_features.py::TestFullFeatureSet::test_no_null_features_for_known_customers PASSED [ 89%]
+	tests/test_features.py::TestFullFeatureSet::test_output_has_customer_id_column PASSED [ 94%]
+	tests/test_features.py::TestSingleTransactionEdgeCase::test_one_transaction_contributes_correctly_to_each_feature PASSED [100%]
+	  "auc_lift_ci_low": 0.0427,
+	  "auc_roc": 0.7835,
+	  "baseline_auc_roc": 0.7208,
+	  "lift_ci_low": 0.0427,
+	  "precision_top10": 0.7267,
+	  "recall_top10": 0.3303,
+	      "recall_top10": 0.4404432132963989,
+	      "recall_top10": 0.15384615384615385,
+	      "recall_top10": 0.19047619047619047,
+	      "recall_top10": 0.2079646017699115,
+	tests/test_model.py::TestModelLoading::test_model_loads_successfully PASSED [  4%]
+	tests/test_model.py::TestModelLoading::test_model_has_expected_feature_count PASSED [  8%]
+	tests/test_model.py::TestModelLoading::test_model_metadata_exists PASSED [ 13%]
+	tests/test_model.py::TestModelLoading::test_model_metadata_has_evaluation_metrics PASSED [ 17%]
+	tests/test_model.py::TestModelLoading::test_metadata_records_feature_list PASSED [ 21%]
+	tests/test_model.py::TestPredictionOutput::test_predictions_are_probabilities PASSED [ 26%]
+	tests/test_model.py::TestPredictionOutput::test_predictions_have_no_nans PASSED [ 30%]
+	tests/test_model.py::TestPredictionOutput::test_predictions_use_full_probability_range PASSED [ 34%]
+	tests/test_model.py::TestPredictionOutput::test_single_sample_inference PASSED [ 39%]
+	tests/test_model.py::TestModelDiscrimination::test_churners_score_higher_than_retainers PASSED [ 43%]
+	tests/test_model.py::TestModelDiscrimination::test_auc_roc_on_synthetic_data PASSED [ 47%]
+	tests/test_model.py::TestModelRobustness::test_model_handles_missing_values PASSED [ 52%]
+	tests/test_model.py::TestModelRobustness::test_prediction_stability_across_calls PASSED [ 56%]
+	tests/test_model.py::TestStoredMetricsGate::test_precision_top10_meets_threshold PASSED [ 60%]
+	tests/test_model.py::TestStoredMetricsGate::test_recall_top10_meets_threshold PASSED [ 65%]
+	tests/test_model.py::TestStoredMetricsGate::test_model_beats_baseline PASSED [ 69%]
+	tests/test_model.py::TestStoredMetricsGate::test_positive_rate_is_realistic PASSED [ 73%]
+	tests/test_model.py::TestChampionRegressionPolicy::test_candidate_at_tolerance_boundary_does_not_regress PASSED [ 82%]
+	tests/test_model.py::TestChampionRegressionPolicy::test_candidate_more_than_tolerance_below_champion_regresses PASSED [ 86%]
+	tests/test_fairness.py::test_held_out_metrics_include_valid_recall_for_multiple_tiers PASSED [ 91%]
+	tests/test_fairness.py::test_recall_gap_over_10pp_emits_warning_without_failing PASSED [ 95%]
+	tests/test_fairness.py::test_current_model_gap_is_flagged_but_does_not_block PASSED [100%]
+	tests/test_model.py::TestStoredMetricsGate::test_precision_top10_meets_threshold
+	  /codebuild/output/src2112310895/src/tests/test_fairness.py:56: UserWarning: FAIRNESS FLAG: loyalty-tier recall gap is 28.7%; highest=Bronze (0.440), lowest=Gold (0.154). Review the disparity before model approval.
+	[Container] 2026/10/31 20:24:40.918506 Running command echo "Build status $CODEBUILD_BUILD_SUCCEEDING"
+	Build status 1

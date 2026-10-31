@@ -1,0 +1,53 @@
+{
+    "ModelPackageSummaryList": [
+        {
+            "ModelPackageGroupName": "northstar-churn-models",
+            "ModelPackageVersion": 5,
+            "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/5",
+            "CreationTime": "2026-10-31T14:24:03.044000-06:00",
+            "ModelPackageStatus": "Completed",
+            "ModelApprovalStatus": "Approved",
+            "ModelPackageRegistrationType": "Registered"
+        },
+        {
+            "ModelPackageGroupName": "northstar-churn-models",
+            "ModelPackageVersion": 4,
+            "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/4",
+            "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.7819, precision@top10=0.7167, recall@top10=0.3258",
+            "CreationTime": "2026-10-12T22:06:56.602000-06:00",
+            "ModelPackageStatus": "Completed",
+            "ModelApprovalStatus": "PendingManualApproval",
+            "ModelPackageRegistrationType": "Registered"
+        },
+        {
+            "ModelPackageGroupName": "northstar-churn-models",
+            "ModelPackageVersion": 3,
+            "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/3",
+            "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.78, precision@top10=0.72, recall@top10=0.3273",
+            "CreationTime": "2026-10-12T22:00:28.782000-06:00",
+            "ModelPackageStatus": "Completed",
+            "ModelApprovalStatus": "PendingManualApproval",
+            "ModelPackageRegistrationType": "Registered"
+        },
+        {
+            "ModelPackageGroupName": "northstar-churn-models",
+            "ModelPackageVersion": 2,
+            "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/2",
+            "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.7823, precision@top10=0.71, recall@top10=0.3227",
+            "CreationTime": "2026-10-12T21:58:19.055000-06:00",
+            "ModelPackageStatus": "Completed",
+            "ModelApprovalStatus": "PendingManualApproval",
+            "ModelPackageRegistrationType": "Registered"
+        },
+        {
+            "ModelPackageGroupName": "northstar-churn-models",
+            "ModelPackageVersion": 1,
+            "ModelPackageArn": "arn:aws:sagemaker:us-east-1:722160254691:model-package/northstar-churn-models/1",
+            "ModelPackageDescription": "NorthStar churn model trained 2026-10-13; AUC-ROC=0.7819, precision@top10=0.7167, recall@top10=0.3258",
+            "CreationTime": "2026-10-12T21:53:45.557000-06:00",
+            "ModelPackageStatus": "Completed",
+            "ModelApprovalStatus": "PendingManualApproval",
+            "ModelPackageRegistrationType": "Registered"
+        }
+    ]
+}

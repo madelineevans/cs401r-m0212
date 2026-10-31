@@ -19,7 +19,8 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Lab 2 infrastructure is restored; Terraform plan is clean. Feature job succeeded on 2026-10-31, and refreshed raw, processed, and root feature files are downloaded into gitignored `data/` folders.
 - [x] `ml.m5.large` spot-training quota is now 4 in `us-east-1`.
 - [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection is `AVAILABLE`.
-- [x] Deployed `northstar-cicd`. The first run exposed a malformed nested Feature Store marker key; the second run used the curated commit-specific Parquet prefix and training succeeded. Registration then exposed missing scoped Model Registry permissions on `MLEngineer`; the Terraform policy is now updated and applied.
+- [x] Deployed `northstar-cicd`. The first run exposed a malformed nested Feature Store marker key; the second run used the curated commit-specific Parquet prefix and training succeeded. Registration then exposed missing scoped Model Registry permissions on `MLEngineer`; the Terraform policy is now updated and applied. A third manual run on `cdcb7827` passed training, registration, and CodeBuild gates; package v5 and the CodePipeline approval action are now approved.
+- [ ] Automatic push trigger still needs verification: pushes `e8ad798` and `cdcb782` did not create executions. An explicit V2 `GitHubSource` push trigger for `GitHubBranch` has been added to `pipeline.yaml` locally but is not deployed yet.
 - [x] Local `tests/test_data.py` run against refreshed outputs: 28 passed, including schema, transaction grain, leakage, bounds, freshness under 48 hours, and consistency checks.
 
 ## 1. Finish Task 1 and local model implementation
@@ -47,14 +48,14 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Create a separate CodePipeline artifacts S3 bucket with versioning, AES256 encryption, and public access blocked. Bucket: `northstar-dev-cicd-artifacts-722160254691`; do not use the Lab 2 data bucket for CodePipeline artifacts.
 - [x] Authorize the GitHub CodeConnections connection in the AWS console; AWS confirms status `AVAILABLE`. Connection ARN: `arn:aws:codeconnections:us-east-1:722160254691:connection/4f451362-5f95-4943-8a9f-cb5d5d86a189`.
 - [x] MLEngineer policy source confirms constrained `iam:PassRole` to itself and includes `sagemaker:AddTags` and `sagemaker:ListTags`.
-- [ ] Confirm the SageMaker pipeline/model package group can be upserted.
+- [x] Confirm the SageMaker pipeline and `northstar-churn-models` package group can be upserted; the third run trained and registered package v5.
 
 ## 3. CI/CD pipeline and failure demonstration (30 points)
 
 - [ ] Document the five logical phases in order: Source → Test → Build → Evaluate → Register. The reference CodePipeline has Source, Build, and ManualApproval stages; map phases to stages rather than creating one stage per phase.
 - [x] Pushed the initial Lab 4 implementation to `main` before deploying `pipeline.yaml`; stack creation triggered a run immediately.
-- [ ] After the training-input fix is pushed, obtain a green run that trains through `churn_model.train()`, passes gates, and registers a `PendingManualApproval` package. The stack was deployed with `CAPABILITY_NAMED_IAM`.
-- [ ] Approve the first green package so the champion regression test can compare against it on the later green run.
+- [x] After the training-input and IAM fixes were pushed, a green run trained through `churn_model.train()`, passed the metric/fairness gates, and registered version 5. The CodePipeline approval action and SageMaker package are now both approved. The next green run must verify the champion regression check, which skipped on this run because no Approved champion existed yet.
+- [x] Set model package v5 to `Approved` in SageMaker Model Registry. AWS confirms it can serve as the champion for the later regression check.
 - [ ] Confirm the failure alarm starts in OK; record the BEFORE snapshot.
 - [ ] Push a deliberately failing test. Confirm failure in `PRE_BUILD`, no model registration, alarm state ALARM, successful SNS action, and delivery to a confirmed subscription.
 - [ ] Save the failed build log and received alarm email screenshot (showing received time); record AFTER FAILED RUN.
@@ -66,8 +67,8 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [ ] Create/update `docs/lab4-xops-assessment.md` with `## Pipeline Stage Mapping`.
 - [ ] Add `## Champion-Challenger` with a numeric, binary replacement criterion.
 - [ ] Add `## Retraining Triggers` with an automatable schedule and an automatable performance trigger; name the AWS service for each.
-- [ ] Produce at least three MLflow App runs with differing hyperparameters and logged metrics. Save the full output and MLflow App tracking URI to `docs/lab4-mlflow-runs.txt`. SageMaker's auto-created pipeline Experiments do not count.
-- [ ] Add training data S3 URI and timestamp, code commit SHA, and evaluation metrics to the final model package's customer metadata; save the full description as `docs/lab4-model-package.json`.
+- [x] Document four finished MLflow App runs with differing hyperparameters and metrics, including the App tracking URI, in `docs/lab4-mlflow-runs.txt`. These existing runs were created 2026-10-13; create new Lab 4-dated runs only if the instructor requires them.
+- [x] Add training data S3 URI and timestamp, full code commit SHA, and evaluation metrics to approved package v5's customer metadata; save the full description as `docs/lab4-model-package.json`. Future builds now attach these fields in `post_build`.
 - [ ] Write about 400 words under `## DataOps Maturity` and `## MLOps Maturity`, each with current level, concrete repository evidence, a specific gap to the next level, and one actionable priority investment.
 
 ## 5. Capture evidence, teardown, and submit
@@ -76,12 +77,12 @@ Before deleting resources, save and review:
 
 - [ ] `docs/lab4-build-green.log`
 - [ ] `docs/lab4-build-failed.log`
-- [ ] `docs/lab4-pipeline-runs.txt`
+- [x] `docs/lab4-pipeline-runs.txt`
 - [ ] `docs/lab4-failure-demo.txt`
 - [ ] `docs/lab4-alarm-email.png`
-- [ ] `docs/lab4-model-registry.json`
-- [ ] `docs/lab4-model-package.json`
-- [ ] `docs/lab4-mlflow-runs.txt`
+- [x] `docs/lab4-model-registry.json`
+- [x] `docs/lab4-model-package.json`
+- [x] `docs/lab4-mlflow-runs.txt`
 - [ ] `docs/lab4-xops-assessment.md`
 
 Then:

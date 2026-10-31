@@ -1,0 +1,78 @@
+Lab 4 MLflow App run evidence
+============================
+
+These are four already-finished runs from the existing SageMaker MLflow App.
+They are reused here to avoid creating new AWS resources. The run timestamps
+are October 13, 2026 UTC; the records are pre-existing Lab 3 runs, not new
+Lab 4-dated runs. If the instructor requires runs created specifically for
+Lab 4, create new runs and replace or supplement this evidence.
+
+MLflow App: northstar-mlflow
+App ARN / MLflow tracking URI:
+  arn:aws:sagemaker:us-east-1:722160254691:mlflow-app/app-CNMYT5SRDKCZ
+Artifact store: s3://northstar-dev-data-722160254691/artifacts/mlflow/
+MLflow version: 3.10.1
+Experiment ID: 1 (northstar-churn)
+Source repository: https://github.com/madelineevans/cs401r-m0212
+Source branch: main
+Source commit recorded by the runs: a029d9c5261f0870905ae1740f6f1062347e6421
+
+Run 1 — xgb-depth6-eta0.1-final
+--------------------------------
+Run ID: 3a142e64c8a14fa9a6e33095ce34adbe
+Status: FINISHED
+Start: 2026-10-13 04:07:14.617 UTC
+End:   2026-10-13 04:07:15.236 UTC
+Artifact URI: s3://northstar-dev-data-722160254691/artifacts/mlflow/workspaces/default/1/3a142e64c8a14fa9a6e33095ce34adbe/artifacts
+Parameters: xgboost_version=3.2.0, max_depth=6, colsample_bytree=0.8,
+  min_child_weight=5, eta=0.1, num_round=200, subsample=0.8,
+  scale_pos_weight=3.544805194805195
+Metrics: precision_top10=0.7167, auc_vs_baseline=0.0593,
+  positive_rate_val=0.22, baseline_auc=0.7226, auc_roc=0.7819,
+  recall_top10=0.3258, lift_ci_low=0.0404, n_val_samples=3000,
+  lift_ci_high=0.0767
+
+Run 2 — xgb-depth6-eta0.05-round400-v3
+---------------------------------------
+Run ID: 87505e2b6c6044b888062fa2452583ee
+Status: FINISHED
+Start: 2026-10-13 04:00:29.922 UTC
+End:   2026-10-13 04:00:30.563 UTC
+Artifact URI: s3://northstar-dev-data-722160254691/artifacts/mlflow/workspaces/default/1/87505e2b6c6044b888062fa2452583ee/artifacts
+Parameters: xgboost_version=3.2.0, max_depth=6, colsample_bytree=0.8,
+  min_child_weight=5, eta=0.05, num_round=400, subsample=0.8,
+  scale_pos_weight=3.544805194805195
+Metrics: precision_top10=0.72, auc_vs_baseline=0.0574,
+  positive_rate_val=0.22, baseline_auc=0.7226, auc_roc=0.78,
+  recall_top10=0.3273, lift_ci_low=0.0379, n_val_samples=3000,
+  lift_ci_high=0.0755
+
+Run 3 — xgb-depth4-eta0.1-v2
+-----------------------------
+Run ID: 440d5117da6c45bf9d7a23f77af311b3
+Status: FINISHED
+Start: 2026-10-13 03:58:20.135 UTC
+End:   2026-10-13 03:58:20.655 UTC
+Artifact URI: s3://northstar-dev-data-722160254691/artifacts/mlflow/workspaces/default/1/440d5117da6c45bf9d7a23f77af311b3/artifacts
+Parameters: xgboost_version=3.2.0, max_depth=4, colsample_bytree=0.8,
+  min_child_weight=5, eta=0.1, num_round=200, subsample=0.8,
+  scale_pos_weight=3.544805194805195
+Metrics: precision_top10=0.71, auc_vs_baseline=0.0597,
+  positive_rate_val=0.22, baseline_auc=0.7226, auc_roc=0.7823,
+  recall_top10=0.3227, lift_ci_low=0.04, n_val_samples=3000,
+  lift_ci_high=0.0782
+
+Run 4 — xgb-depth6-eta0.1-v1
+-----------------------------
+Run ID: ffc1086d3359465a8da5713f4d0d82f0
+Status: FINISHED
+Start: 2026-10-13 03:53:47.212 UTC
+End:   2026-10-13 03:53:47.881 UTC
+Artifact URI: s3://northstar-dev-data-722160254691/artifacts/mlflow/workspaces/default/1/ffc1086d3359465a8da5713f4d0d82f0/artifacts
+Parameters: xgboost_version=3.2.0, max_depth=6, colsample_bytree=0.8,
+  min_child_weight=5, eta=0.1, num_round=200, subsample=0.8,
+  scale_pos_weight=3.544805194805195
+Metrics: precision_top10=0.7167, auc_vs_baseline=0.0593,
+  positive_rate_val=0.22, baseline_auc=0.7226, auc_roc=0.7819,
+  recall_top10=0.3258, lift_ci_low=0.0404, n_val_samples=3000,
+  lift_ci_high=0.0767

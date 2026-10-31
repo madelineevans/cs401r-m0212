@@ -294,6 +294,8 @@ phases:
       # Re-derived, not inherited: CodeBuild does not carry `export`s across
       # phase boundaries, which is why every phase above re-derives ACCOUNT_ID
       # and DATA_BUCKET rather than trusting the previous one.
+      - export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - export DATA_BUCKET="${PROJECT}-${ENVIRONMENT}-data-${ACCOUNT_ID}"
       - export COMMIT_SHA=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c1-8)
 
       # ── Reject a package registered by a build that then failed ───────
@@ -312,6 +314,68 @@ phases:
             --model-approval-status Rejected \
             --approval-description "Auto-rejected: CodeBuild build ${CODEBUILD_BUILD_ID} (commit ${COMMIT_SHA}) failed after registration."
           echo "Rejected $PKG"
+        fi
+
+      # ── Attach model lineage after all model gates pass ─────────────────
+      # Model Registry CustomerMetadataProperties is a string-to-string map.
+      # Keep the full metrics JSON in its S3 object / ModelMetrics reference;
+      # store the required lineage and key scalar gates here.
+      - |
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ] && [ -s /tmp/model_package_arn.txt ]; then
+          PKG=$(cat /tmp/model_package_arn.txt)
+          if [ -z "$PKG" ] || [ "$PKG" = "None" ]; then
+            echo "Successful build has no model package ARN to attach lineage to"
+            exit 1
+          fi
+
+          export FULL_COMMIT_SHA="${CODEBUILD_RESOLVED_SOURCE_VERSION:-unknown}"
+          export TRAINING_DATA_URI="s3://${DATA_BUCKET}/artifacts/training-inputs/${COMMIT_SHA}/"
+          export METRICS_URI="s3://${DATA_BUCKET}/artifacts/evaluations/${COMMIT_SHA}/evaluation_metrics.json"
+          export TRAINING_DATA_TIMESTAMP_UTC=$(aws s3api list-objects-v2 \
+            --bucket "$DATA_BUCKET" \
+            --prefix "features/customers/part-" \
+            --query "Contents[?ends_with(Key, '.parquet')].LastModified" \
+            --output text | tr '\t' '\n' | sort | tail -n 1)
+          if [ -z "$TRAINING_DATA_TIMESTAMP_UTC" ] || [ "$TRAINING_DATA_TIMESTAMP_UTC" = "None" ]; then
+            echo "Could not determine training feature data timestamp"
+            aws sagemaker update-model-package --model-package-arn "$PKG" \
+              --model-approval-status Rejected \
+              --approval-description "Auto-rejected: training data timestamp missing for build ${CODEBUILD_BUILD_ID}." || true
+            exit 1
+          fi
+
+          python - <<'PY'
+        import json
+        import os
+
+        with open("/tmp/eval_metrics.json", encoding="utf-8") as stream:
+            metrics = json.load(stream)
+
+        metadata = {
+            "training_data_s3_uri": os.environ["TRAINING_DATA_URI"],
+            "training_data_timestamp_utc": os.environ["TRAINING_DATA_TIMESTAMP_UTC"],
+            "commit_sha": os.environ["FULL_COMMIT_SHA"],
+            "evaluation_metrics_s3_uri": os.environ["METRICS_URI"],
+        }
+        for key in ("auc_roc", "precision_top10", "recall_top10", "lift_ci_low", "lift_ci_high"):
+            value = metrics.get(key)
+            if value is None:
+                raise ValueError(f"Required lineage metric missing: {key}")
+            metadata[key] = str(value)
+
+        with open("/tmp/customer_metadata.json", "w", encoding="utf-8") as stream:
+            json.dump(metadata, stream, sort_keys=True)
+        PY
+          if ! aws sagemaker update-model-package \
+            --model-package-arn "$PKG" \
+            --customer-metadata-properties file:///tmp/customer_metadata.json; then
+            echo "Failed to attach model lineage; rejecting package $PKG"
+            aws sagemaker update-model-package --model-package-arn "$PKG" \
+              --model-approval-status Rejected \
+              --approval-description "Auto-rejected: lineage metadata update failed for build ${CODEBUILD_BUILD_ID}." || true
+            exit 1
+          fi
+          echo "Attached training data, commit, and evaluation lineage to $PKG"
         fi
 
       # ── Publish build outcome to CloudWatch ───────────────────────────

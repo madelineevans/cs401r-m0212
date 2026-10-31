@@ -18,9 +18,9 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Existing feature files were copied to a temporary local channel for a preliminary trainer run. One timestamped offline-store `.txt` marker failed to copy because Windows disallows `:` in filenames; the trainer reads Parquet/CSV and ignores that marker.
 - [x] Lab 2 infrastructure is restored; Terraform plan is clean. Feature job succeeded on 2026-10-31, and refreshed raw, processed, and root feature files are downloaded into gitignored `data/` folders.
 - [x] `ml.m5.large` spot-training quota is now 4 in `us-east-1`.
-- [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection is `AVAILABLE`.
+- [x] Created the separate CI artifacts bucket with versioning, encryption, and public access blocked; GitHub connection `401r-Lab4` is `AVAILABLE` in `us-east-1`.
 - [x] Deployed `northstar-cicd`. The first run exposed a malformed nested Feature Store marker key; the second run used the curated commit-specific Parquet prefix and training succeeded. Registration then exposed missing scoped Model Registry permissions on `MLEngineer`; the Terraform policy is now updated and applied. A third manual run on `cdcb7827` passed training, registration, and CodeBuild gates; package v5 and the CodePipeline approval action are now approved.
-- [ ] Automatic push trigger still needs verification: explicit V2 `GitHubSource` push trigger for `main` is deployed and appears in `get-pipeline`, but pushes of `4c1062f`, `470506f`, `753a911`, and `a2ba7ca` did not start executions. All verification runs were started manually. Check the AWS Connector for GitHub installation and webhook permission.
+- [ ] Automatic push trigger still needs verification: explicit V2 `GitHubSource` push trigger for `main` is deployed and appears in `get-pipeline`. Earlier pushes did not start executions; CloudFormation now points the source action to the newly available `401r-Lab4` connection. Verify with the next main-branch push.
 - [x] Local `tests/test_data.py` run against refreshed outputs: 28 passed, including schema, transaction grain, leakage, bounds, freshness under 48 hours, and consistency checks.
 
 ## 1. Finish Task 1 and local model implementation
@@ -46,7 +46,7 @@ Use this as the running checklist while completing Lab 4. Mark an item complete 
 - [x] Recheck `ml.m5.large` spot-training quota in `us-east-1`; it is 4.
 - [x] Confirm Lab 2 infrastructure is up and the feature job has run within 48 hours. The restored feature job succeeded on 2026-10-31; raw, processed, and feature outputs are fresh.
 - [x] Create a separate CodePipeline artifacts S3 bucket with versioning, AES256 encryption, and public access blocked. Bucket: `northstar-dev-cicd-artifacts-722160254691`; do not use the Lab 2 data bucket for CodePipeline artifacts.
-- [x] Authorize the GitHub CodeConnections connection in the AWS console; AWS confirms status `AVAILABLE`. Connection ARN: `arn:aws:codeconnections:us-east-1:722160254691:connection/4f451362-5f95-4943-8a9f-cb5d5d86a189`.
+- [x] Authorize the GitHub CodeConnections connection in the AWS console; AWS confirms `401r-Lab4` status `AVAILABLE`. Connection ARN: `arn:aws:codeconnections:us-east-1:722160254691:connection/501068de-2fbf-4df9-b619-00b6489676dd`.
 - [x] MLEngineer policy source confirms constrained `iam:PassRole` to itself and includes `sagemaker:AddTags` and `sagemaker:ListTags`.
 - [x] Confirm the SageMaker pipeline and `northstar-churn-models` package group can be upserted; the third run trained and registered package v5.
 

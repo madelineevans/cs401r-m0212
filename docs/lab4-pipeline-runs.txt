@@ -111,3 +111,9 @@ Other evaluation metrics: AUC 0.7835; baseline AUC 0.7208; precision@10
 Alarm returned to OK at 2026-10-31T16:14:22-06:00.
 The CodePipeline ManualApproval action later succeeded. SageMaker package v8
 remains PendingManualApproval until separately approved in Model Registry.
+
+After Run 6, the CodePipeline stack was updated to use GitHub connection
+`401r-Lab4` (available, us-east-1), ARN
+arn:aws:codeconnections:us-east-1:722160254691:connection/501068de-2fbf-4df9-b619-00b6489676dd.
+AWS reports the pipeline remains V2 with a `GitHubSource` push trigger filtered
+to `main`. Automatic trigger verification is pending the next push.

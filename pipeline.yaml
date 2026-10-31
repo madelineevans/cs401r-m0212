@@ -361,7 +361,7 @@ Resources:
       # CodeStarSourceConnection action can detect changes by default, but our
       # initial deployed pipeline did not start when commits were pushed.
       Triggers:
-        - Provider: CodeStarSourceConnection
+        - ProviderType: CodeStarSourceConnection
           GitConfiguration:
             SourceActionName: GitHubSource
             Push:

@@ -6,8 +6,11 @@ BEFORE
 - SNS topic: arn:aws:sns:us-east-1:722160254691:northstar-model-approvals
 - Confirmed email subscription ARN:
   arn:aws:sns:us-east-1:722160254691:northstar-model-approvals:8d62f820-66a2-41de-b45f-fc33b6e8bdec
+- The latest existing package before the corrected failure was v7 (Rejected);
+  v5 (Approved, AUC 0.7835) was the champion. Package v7 came from the earlier
+  stopped attempt described below.
 
-FAILURE
+AFTER FAILED RUN
 - Failure-test commit: 470506f0d71777575b8a13a85e767f24bf6c46d6
 - CodePipeline execution: a50a34d8-39ab-4f3f-8f15-b2ba0bf3461d
 - CodeBuild build: northstar-ci:c5b1ed1e-9024-43c6-8076-a369763b541f
@@ -17,6 +20,8 @@ FAILURE
   1 failed, 19 passed. The failure was the intentional assertion in
   test_lab4_intentional_ci_failure_demo.
 - SageMaker was not started by this corrected run; no package was registered.
+- The newest package remained v7 (Rejected); the failed run created no new
+  registry version.
 - Alarm: ALARM at 2026-10-31 16:00:22 -06:00.
 - CloudWatch alarm history: "Successfully executed action" for the SNS topic.
 - Email receipt screenshot: docs/lab4-alarm-email.png (received Sat 10/31/2026
@@ -28,6 +33,7 @@ AFTER REVERT
 - Recovery CodeBuild: northstar-ci:8de419c4-c67b-470f-96cd-4e4123aef26a — SUCCEEDED
 - SageMaker execution: 3xdzwo2p7usm — Succeeded; package v8 is
   PendingManualApproval and v5 remains the Approved champion.
+- The registry advanced from v7 to v8 only after the reverted tests passed.
 - Champion regression passed: v5 AUC=0.7835; candidate AUC=0.7835.
 - Alarm returned to OK at 2026-10-31 16:14:22 -06:00.
 - The CodePipeline ManualApproval action for v8 succeeded. It does not change

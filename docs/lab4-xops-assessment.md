@@ -16,16 +16,16 @@ Compare each candidate with the newest `Approved` package. Approve only if candi
 
 ## Retraining Triggers
 
-**Proposed schedule:** use Amazon EventBridge Scheduler to start the SageMaker Pipeline weekly. **Proposed performance trigger:** SageMaker Model Monitor measures drift; a CloudWatch alarm invokes an EventBridge rule that starts the pipeline. Neither trigger is deployed in this lab.
+**Proposed schedule:** Amazon EventBridge Scheduler starts the SageMaker Pipeline weekly. **Proposed performance trigger:** if a rolling 7-day labeled production window has precision@10 < 0.50 or recall@10 < 0.25, SageMaker Model Monitor publishes the result, a CloudWatch alarm fires, and an EventBridge rule starts the pipeline. These are proposed, automatable triggers; neither is deployed in this lab.
 
 ## DataOps Maturity
 
-**Current level: 2/4.** The repository separates raw, processed, and customer-feature data. `tests/test_data.py` checks schema, transaction grain, leakage, freshness, and consistency; `tests/test_features.py` covers bounds and edge cases. CI stages feature Parquet under a commit-specific S3 prefix and trains from that location. Package metadata records the training URI and timestamp, source commit, and evaluation URI. The final CI run passed the suite.
+**Current level: 2/4.** **Evidence:** the final `docs/lab4-build-green.log` shows 28 data checks and 19 feature tests passing. `tests/test_data.py` checks schema, transaction grain, leakage, freshness, and consistency; `tests/test_features.py` covers bounds and edge cases. `buildspec.yml` stages feature Parquet under a commit-specific S3 prefix. `docs/lab4-model-package.json` records that data URI and timestamp, source commit, and evaluation URI.
 
-**Gap to Level 3:** checks cover a batch snapshot, but do not continuously detect distribution drift, schema changes, or missed feature refreshes. **Priority:** add AWS Glue Data Quality rules to the feature job, publish outcomes and freshness to CloudWatch, and alert before training on stale or invalid outputs.
+**Gap to Level 3:** checks cover batch snapshots but do not continuously detect distribution drift, schema changes, or missed feature refreshes. **Top priority investment:** add AWS Glue Data Quality rules to the feature job, publish outcomes and freshness to CloudWatch, and alert before training on stale or invalid outputs.
 
 ## MLOps Maturity
 
-**Current level: 2/4.** SageMaker Pipeline trains the model using managed spot capacity. CI checks model behavior and metric gates; fairness gaps are warnings. Registry versions preserve candidates, and the champion regression test compares each with the latest approved model. Four MLflow App runs record experiments with distinct parameters and metrics. The final push-triggered run passed and registered v9; pipeline review succeeded.
+**Current level: 2/4.** **Evidence:** `models/churn/pipeline_definition.py` trains with managed spot capacity, while `buildspec.yml` runs tests and evaluation gates. `docs/lab4-build-green.log` records AUC 0.7835, precision@10 0.7267, recall@10 0.3303, a positive 95% lift interval, and the champion v5 comparison. `docs/lab4-model-package.json` records lineage metadata; `docs/lab4-mlflow-runs.txt` documents four distinct MLflow App runs. The push-triggered run registered v9 and its pipeline review succeeded.
 
-**Gap to Level 3:** model promotion remains manual, and production drift monitoring and automatic retraining are not deployed. **Priority:** add SageMaker Model Monitor and CloudWatch alarms, then connect weekly and drift-driven EventBridge triggers to the pipeline. Keep registry approval as the deployment gate until monitoring and rollback are demonstrated.
+**Gap to Level 3:** promotion remains manual, and production drift monitoring and automatic retraining are not deployed. **Top priority investment:** deploy SageMaker Model Monitor and CloudWatch alarms, then connect weekly and drift-driven EventBridge triggers. Keep registry approval as the deployment gate until monitoring and rollback are demonstrated.

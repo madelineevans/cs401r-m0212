@@ -92,9 +92,9 @@ Before deleting resources, save and review:
 
 Then:
 
-- [ ] Delete the CI CloudFormation stack before the final docs-only push so it does not start another training run.
-- [ ] Empty and delete the versioned artifacts bucket; delete the CodeBuild log group; run Lab 2 teardown when finished.
-- [ ] Before deleting the data bucket, reject any Approved model package that points to an artifact being deleted.
+- [x] Delete the CI CloudFormation stack before the final docs-only push so it does not start another training run.
+- [x] Empty and delete the versioned artifacts bucket; delete the CodeBuild log group; run Lab 2 teardown. `docs/lab2-destroy-output.txt` records successful final verification; the Terraform state bucket is retained for Lab 3.
+- [x] Before deleting the data bucket, reject any Approved model package that points to an artifact being deleted (v5 was changed to Rejected before the bucket was emptied).
 - [ ] Commit and push the work, tag the graded commit `lab4-submit`, push the tag, and submit the repository URL in Canvas.
 
 The handout estimates about $0.02 per pipeline run and $0.045 per hour for the Lab 2 NAT Gateway. Keep infrastructure up only while collecting evidence that requires it.

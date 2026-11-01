@@ -137,3 +137,7 @@ Evaluation metrics for commit 32a2b35:
 - Registry metadata records the full commit SHA, training-data S3 URI and
   timestamp, metrics URI, and scalar metrics.
 - Full CodeBuild logs are saved in `docs/lab4-build-green.log`.
+
+Teardown note: after saving this evidence, package v5 was changed from Approved
+to Rejected before its model artifact bucket was deleted. The saved registry
+JSON is a snapshot of package statuses at the time of the final run.

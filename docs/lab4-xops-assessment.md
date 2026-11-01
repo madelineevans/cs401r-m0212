@@ -2,30 +2,30 @@
 
 ## Pipeline Stage Mapping
 
-| Logical phase | Implementation |
+| Phase | Implementation and evidence |
 |---|---|
-| Source | CodePipeline `GitHubSource` uses the available `401r-Lab4` GitHub CodeConnections connection in us-east-1. A V2 push trigger filtered to `main` was verified by the WebhookV2 run for commit `32a2b35`. |
-| Test | CodeBuild `PRE_BUILD` installs requirements and runs the repository pytest suites. A failed test exits before training or registration. |
-| Build | CodeBuild stages the commit-specific Parquet training input and invokes the SageMaker churn pipeline. SageMaker trains with managed spot capacity. |
-| Evaluate | The trainer writes evaluation metrics; CodeBuild enforces precision@10 ≥ 0.50, recall@10 ≥ 0.25, and positive 95% AUC lift confidence interval. Fairness gaps over 10 percentage points warn without blocking. |
-| Register | A passing candidate is registered in SageMaker Model Registry as `PendingManualApproval`. CodePipeline then waits for a human approval action. |
+| Source | CodePipeline V2 uses the available `401r-Lab4` GitHub connection. Push commit `32a2b35` triggered `WebhookV2` on `main`. |
+| Test | CodeBuild runs pytest in `PRE_BUILD`; the deliberate failure stopped before training or registration and triggered the alarm email. |
+| Build | CodeBuild stages commit-specific feature Parquet data in S3 and starts the SageMaker Pipeline, which trains using managed spot capacity. |
+| Evaluate | Gates require precision@10 ≥ 0.50, recall@10 ≥ 0.25, and a 95% AUC-lift interval excluding zero. Fairness gaps above 10 percentage points warn without blocking. |
+| Register | Passing candidates enter SageMaker Model Registry as `PendingManualApproval`; CodePipeline’s separate metrics review action requires human approval. |
 
 ## Champion-Challenger
 
-The newest `Approved` package is the champion. Approve a candidate only when its AUC is no more than 0.02 below the champion AUC and all absolute evaluation gates pass: precision@10 ≥ 0.50, recall@10 ≥ 0.25, and the 95% confidence interval for AUC lift over the recency baseline excludes zero. Otherwise, reject the candidate. This is a binary promotion rule; the champion comparison reports the champion version and both AUC values in the build warning summary.
+Compare each candidate with the newest `Approved` package. Approve only if candidate AUC ≥ champion AUC − 0.02 and all absolute gates pass; otherwise, reject it. The build warning records the champion version and both AUCs. v5 was champion in the final run; v9 passed the checks and awaits registry approval.
 
 ## Retraining Triggers
 
-**Scheduled trigger (proposed):** an Amazon EventBridge Scheduler schedule starts the SageMaker Pipeline weekly, giving the model a regular refresh cadence. **Performance trigger (proposed):** SageMaker Model Monitor records feature or model-quality drift; a CloudWatch alarm on the monitor metric invokes an EventBridge rule that starts the SageMaker Pipeline. These triggers are documented designs, not deployed resources in this lab environment.
+**Proposed schedule:** use Amazon EventBridge Scheduler to start the SageMaker Pipeline weekly. **Proposed performance trigger:** SageMaker Model Monitor measures drift; a CloudWatch alarm invokes an EventBridge rule that starts the pipeline. Neither trigger is deployed in this lab.
 
 ## DataOps Maturity
 
-**Current level: 2/4.** This repository has distinct raw, processed, and customer-feature outputs, with automated checks for schemas, transaction grain, leakage, feature bounds, freshness, and consistency. `tests/test_data.py` contains 28 passing checks on the refreshed data, and `tests/test_features.py` has 19 passing unit and edge-case checks. The CI build uses root Parquet files from the feature output, stages them under a commit-specific S3 prefix, and passes that exact location to training. The registered candidate also records the training-data S3 URI, source-data timestamp, full code SHA, and evaluation-metrics URI in SageMaker package metadata. These controls make a run repeatable and give reviewers evidence about which data and code produced a model.
+**Current level: 2/4.** The repository separates raw, processed, and customer-feature data. `tests/test_data.py` checks schema, transaction grain, leakage, freshness, and consistency; `tests/test_features.py` covers bounds and edge cases. CI stages feature Parquet under a commit-specific S3 prefix and trains from that location. Package metadata records the training URI and timestamp, source commit, and evaluation URI. The final CI run passed the suite.
 
-**Gap to Level 3:** data checks validate a batch snapshot and freshness at build time; they do not continuously detect changes in distributions, schema drift, or a missed upstream feature refresh. **Top priority investment:** add AWS Glue Data Quality rules to the feature job, publish rule outcomes and freshness to CloudWatch, and alert on failed or stale outputs before CodeBuild starts training. This would turn data checks into an operational signal with an owner and a response path.
+**Gap to Level 3:** checks cover a batch snapshot, but do not continuously detect distribution drift, schema changes, or missed feature refreshes. **Priority:** add AWS Glue Data Quality rules to the feature job, publish outcomes and freshness to CloudWatch, and alert before training on stale or invalid outputs.
 
 ## MLOps Maturity
 
-**Current level: 2/4.** Training is implemented behind a stable `train(df, seed=42)` contract and runs through a SageMaker Pipeline using managed spot capacity. The CI job tests the model interface, evaluates precision and recall at the top 10%, and requires the 95% AUC-lift interval over a recency baseline to exclude zero. Fairness checks report loyalty-tier recall gaps as warnings. Passing models are versioned in SageMaker Model Registry as pending approval; approved package v5 now provides a champion for the regression gate. Four finished MLflow App runs preserve earlier experiments with different hyperparameters and metrics.
+**Current level: 2/4.** SageMaker Pipeline trains the model using managed spot capacity. CI checks model behavior and metric gates; fairness gaps are warnings. Registry versions preserve candidates, and the champion regression test compares each with the latest approved model. Four MLflow App runs record experiments with distinct parameters and metrics. The final push-triggered run passed and registered v9; pipeline review succeeded.
 
-**Gap to Level 3:** reliable, monitored automation after registration is not complete. Model promotion still requires a person, and production drift monitoring and automatic retraining are proposals rather than deployed controls. **Top priority investment:** add SageMaker Model Monitor with CloudWatch alarms, then connect a weekly EventBridge schedule and a monitor-driven EventBridge rule to the SageMaker Pipeline. Keep registry approval as the deployment gate until monitoring and rollback behavior are demonstrated.
+**Gap to Level 3:** model promotion remains manual, and production drift monitoring and automatic retraining are not deployed. **Priority:** add SageMaker Model Monitor and CloudWatch alarms, then connect weekly and drift-driven EventBridge triggers to the pipeline. Keep registry approval as the deployment gate until monitoring and rollback are demonstrated.

@@ -14,8 +14,9 @@ AFTER FAILED RUN
 - Failure-test commit: 470506f0d71777575b8a13a85e767f24bf6c46d6
 - CodePipeline execution: a50a34d8-39ab-4f3f-8f15-b2ba0bf3461d
 - CodeBuild build: northstar-ci:c5b1ed1e-9024-43c6-8076-a369763b541f
-- The pushed commit did not start automatically. The run was started manually;
-  automatic push triggering remains unresolved.
+- This failure-test push did not start automatically with the then-current
+  connection, so the run was started manually. The replacement `401r-Lab4`
+  connection was later verified by Run 7's `WebhookV2` trigger.
 - CodeBuild failed in PRE_BUILD while running tests/test_features.py:
   1 failed, 19 passed. The failure was the intentional assertion in
   test_lab4_intentional_ci_failure_demo.

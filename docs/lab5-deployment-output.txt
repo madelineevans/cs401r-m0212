@@ -1,0 +1,212 @@
+Lab 5 deployment evidence - AWS account 722160254691
+===== 0. Model Registry approval status =====
+---------------------------------------------------------------------
+|                         ListModelPackages                         |
++----+-------------------------+------------------------------------+
+|  10|  Approved               |  2026-11-14T16:19:25.993000-07:00  |
+|  9 |  Approved               |  2026-10-31T16:42:18.865000-06:00  |
+|  8 |  PendingManualApproval  |  2026-10-31T16:12:36.060000-06:00  |
+|  7 |  Rejected               |  2026-10-31T15:54:22.918000-06:00  |
+|  6 |  PendingManualApproval  |  2026-10-31T15:37:38.949000-06:00  |
+|  5 |  Rejected               |  2026-10-31T14:24:03.044000-06:00  |
+|  4 |  Approved               |  2026-10-12T22:06:56.602000-06:00  |
+|  3 |  PendingManualApproval  |  2026-10-12T22:00:28.782000-06:00  |
+|  2 |  PendingManualApproval  |  2026-10-12T21:58:19.055000-06:00  |
+|  1 |  PendingManualApproval  |  2026-10-12T21:53:45.557000-06:00  |
++----+-------------------------+------------------------------------+
+===== 1. Endpoint configurations and variant weights =====
+{
+    "Status": "InService",
+    "Config": "northstar-churn-prod-t2-demo",
+    "Variants": [
+        {
+            "Name": "champion",
+            "Weight": 0.8999999761581421,
+            "Instances": 1
+        },
+        {
+            "Name": "canary",
+            "Weight": 0.10000000149011612,
+            "Instances": 1
+        }
+    ]
+}
+----------------------------------------------------------------------------------
+|                             DescribeEndpointConfig                             |
++----------+-----------------------------+---------------+-----------------------+
+|  champion|  northstar-churn-model-v4   |  ml.t2.medium |  0.8999999761581421   |
+|  canary  |  northstar-churn-model-v10  |  ml.t2.medium |  0.10000000149011612  |
++----------+-----------------------------+---------------+-----------------------+
+--- Final m5.large endpoint config and live weights ---
+{
+    "Status": "InService",
+    "Config": "northstar-churn-prod-canary",
+    "LastModified": "2026-11-14T17:09:54.857000-07:00",
+    "Variants": [
+        {
+            "Name": "champion",
+            "Weight": 0.8999999761581421,
+            "Instances": 1
+        },
+        {
+            "Name": "canary",
+            "Weight": 0.10000000149011612,
+            "Instances": 1
+        }
+    ]
+}
+---------------------------------------------------------------------------------
+|                            DescribeEndpointConfig                             |
++----------+-----------------------------+--------------+-----------------------+
+|  champion|  northstar-churn-model-v4   |  ml.m5.large |  0.8999999761581421   |
+|  canary  |  northstar-churn-model-v10  |  ml.m5.large |  0.10000000149011612  |
++----------+-----------------------------+--------------+-----------------------+
+===== 2. Auto scaling attempt, live quota, and result =====
+aws application-autoscaling register-scalable-target --cli-input-json file://deployment/configs/scalable-target.json
+ValidationException: You cannot register a variant with ml.t2.medium instance type as a scalable target. Burstable instances are not supported.
+ml.m5.large for endpoint usage	30.0
+--- m5 scalable target and target-tracking policy ---
+--------------------------------------------------------------------------------------------------------
+|                                        DescribeScalableTargets                                       |
++-------------------------------------------------+------------------------------------------+----+----+
+|  endpoint/northstar-churn-prod/variant/champion |  sagemaker:variant:DesiredInstanceCount  |  1 |  2 |
++-------------------------------------------------+------------------------------------------+----+----+
+------------------------------------------------------------------------------------------------------------------------------------------------
+|                                                            DescribeScalingPolicies                                                           |
++-------------------------------------------+--------------------------------------------------+------------------------+---------+-----+------+
+|  northstar-churn-champion-target-tracking |  endpoint/northstar-churn-prod/variant/champion  |  TargetTrackingScaling |  1000.0 |  60 |  600 |
++-------------------------------------------+--------------------------------------------------+------------------------+---------+-----+------+
+===== 3. Rollback alarm definition and live state =====
+{
+  "AlarmName": "northstar-churn-rollback-latency",
+  "AlarmDescription": "Rollback canary if p95 model latency exceeds 200 ms for two consecutive minutes.",
+  "ActionsEnabled": false,
+  "MetricName": "ModelLatency",
+  "Namespace": "AWS/SageMaker",
+  "Dimensions": [
+    { "Name": "EndpointName", "Value": "northstar-churn-prod" },
+    { "Name": "VariantName", "Value": "canary" }
+  ],
+  "ExtendedStatistic": "p95",
+  "Unit": "Microseconds",
+  "Period": 60,
+  "EvaluationPeriods": 2,
+  "DatapointsToAlarm": 2,
+  "Threshold": 200000,
+  "ComparisonOperator": "GreaterThanThreshold",
+  "TreatMissingData": "notBreaching"
+}
+------------------------------------------------------------------------------------
+|                                  DescribeAlarms                                  |
++-----------------------------------+---------------+------+-----------+----+------+
+|  northstar-churn-rollback-latency |  ModelLatency |  p95 |  200000.0 |  2 |  OK  |
++-----------------------------------+---------------+------+-----------+----+------+
+--- Alarm state after invocations ---
+------------------------------------------------------------------------------------
+|                                  DescribeAlarms                                  |
++-----------------------------------+---------------+------+-----------+----+------+
+|  northstar-churn-rollback-latency |  ModelLatency |  p95 |  200000.0 |  2 |  OK  |
++-----------------------------------+---------------+------+-----------+----+------+
+--- Observed canary latency unit and p95 ---
+{
+    "Label": "ModelLatency",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-11-14T17:04:00-07:00",
+            "SampleCount": 2.0,
+            "Unit": "Microseconds",
+            "ExtendedStatistics": {
+                "p95": 4163.469993429434
+            }
+        },
+        {
+            "Timestamp": "2026-11-14T17:00:00-07:00",
+            "SampleCount": 1.0,
+            "Unit": "Microseconds",
+            "ExtendedStatistics": {
+                "p95": 5981.0
+            }
+        },
+        {
+            "Timestamp": "2026-11-14T17:03:00-07:00",
+            "SampleCount": 4.0,
+            "Unit": "Microseconds",
+            "ExtendedStatistics": {
+                "p95": 5476.381437992891
+            }
+        },
+        {
+            "Timestamp": "2026-11-14T16:59:00-07:00",
+            "SampleCount": 2.0,
+            "Unit": "Microseconds",
+            "ExtendedStatistics": {
+                "p95": 4118.653206835844
+            }
+        },
+        {
+            "Timestamp": "2026-11-14T17:02:00-07:00",
+            "SampleCount": 2.0,
+            "Unit": "Microseconds",
+            "ExtendedStatistics": {
+                "p95": 3348.4558440619508
+            }
+        },
+        {
+            "Timestamp": "2026-11-14T16:58:00-07:00",
+            "SampleCount": 4.0,
+            "Unit": "Microseconds",
+            "ExtendedStatistics": {
+                "p95": 5993.193953047135
+            }
+        },
+        {
+            "Timestamp": "2026-11-14T17:01:00-07:00",
+            "SampleCount": 2.0,
+            "Unit": "Microseconds",
+            "ExtendedStatistics": {
+                "p95": 4221.651878867839
+            }
+        }
+    ]
+}
+===== 4. Observed traffic split at 9:1 =====
+champion 181 / canary 19 (n=200)
+--- S3 data-capture write verification ---
+2026-11-14 16:57:35        429 datacapture/northstar-churn-prod/northstar-churn-prod/canary/2026/11/14/23/56-32-474-8881d17f-c6e5-45d0-82f3-b281230eb5a1.jsonl
+2026-11-14 16:59:25       2145 datacapture/northstar-churn-prod/northstar-churn-prod/canary/2026/11/14/23/57-45-954-a8e0daa2-83f8-4a75-8027-dec9154bbcff.jsonl
+2026-11-14 17:00:35        858 datacapture/northstar-churn-prod/northstar-churn-prod/canary/2026/11/14/23/59-21-763-82ac4ac1-29bd-47d3-869b-7afe24a6bdad.jsonl
+2026-11-14 17:01:55        858 datacapture/northstar-churn-prod/northstar-churn-prod/canary/2026/11/15/00/00-30-952-6f1a2ca2-753d-4247-8632-823fc90212df.jsonl
+2026-11-14 17:02:55        858 datacapture/northstar-churn-prod/northstar-churn-prod/canary/2026/11/15/00/01-48-555-9e45b0c6-96fb-4fed-b1fe-54bfd05bd9f4.jsonl
+2026-11-14 17:04:05       1716 datacapture/northstar-churn-prod/northstar-churn-prod/canary/2026/11/15/00/02-53-733-ef1a9206-8a29-4ffd-b9e7-ae9eb8dad2e9.jsonl
+2026-11-14 17:05:25       1287 datacapture/northstar-churn-prod/northstar-churn-prod/canary/2026/11/15/00/03-59-894-4846e283-3083-49d0-b263-9ec2cb73b3de.jsonl
+2026-11-14 16:52:22        430 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/14/23/51-21-298-b5bd1da0-556c-44bf-a488-8d3427483c7f.jsonl
+2026-11-14 16:57:22       8600 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/14/23/56-13-875-70c75224-db62-4351-93a6-fac8126a952c.jsonl
+2026-11-14 16:58:22       9030 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/14/23/57-14-014-dddceaca-bdaf-462e-b99f-e98ca79f9ba1.jsonl
+2026-11-14 16:59:22       9460 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/14/23/58-16-303-251df711-6d70-4c05-b995-f7356ff1aa68.jsonl
+2026-11-14 17:00:22       9460 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/14/23/59-16-581-0abf07b0-944e-4464-8c07-dfb168c43e64.jsonl
+2026-11-14 17:01:32      10750 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/15/00/00-18-065-d3c0087f-e851-4dbf-9966-c30ef4dfd24c.jsonl
+2026-11-14 17:02:32       9460 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/15/00/01-21-843-3d3d89ba-76d8-4b56-9d82-cc9462b2d897.jsonl
+2026-11-14 17:03:32      10320 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/15/00/02-24-037-76224be7-7df3-420d-a1a7-9ffd2fffb950.jsonl
+2026-11-14 17:04:32       7740 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/15/00/03-24-849-0d65b584-41f7-4ace-aa03-eb9bf2a2233a.jsonl
+2026-11-14 17:05:42       3010 datacapture/northstar-churn-prod/northstar-churn-prod/champion/2026/11/15/00/04-26-766-e9b61240-ad2b-4faf-b7ef-25cb1ff344c0.jsonl
+--- Direct m5 smoke invocations ---
+champion direct smoke: champion; canary direct smoke: canary
+
+===== 5. After rollback: weights and observed traffic =====
+aws sagemaker describe-endpoint --endpoint-name northstar-churn-prod
+Status: InService
+ProductionVariants:
+  champion: CurrentWeight=1.0, CurrentInstanceCount=1
+  canary: CurrentWeight=0.0, CurrentInstanceCount=1
+
+Post-rollback invoke-endpoint calls (n=100):
+  champion 100
+  canary 0
+
+===== 6. After teardown: live API counts =====
+aws sagemaker list-endpoints --query 'length(Endpoints)' --output text
+0
+aws sagemaker list-endpoint-configs --query 'length(EndpointConfigs)' --output text
+0
+aws application-autoscaling describe-scalable-targets --service-namespace sagemaker --query 'length(ScalableTargets)' --output text
+0

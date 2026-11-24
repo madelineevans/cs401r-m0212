@@ -1,0 +1,157 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Infrastructure: champion CPU and memory",
+        "view": "timeSeries",
+        "region": "us-east-1",
+        "period": 300,
+        "stat": "Average",
+        "metrics": [
+          [
+            "/aws/sagemaker/Endpoints",
+            "CPUUtilization",
+            "EndpointName",
+            "northstar-churn-prod",
+            "VariantName",
+            "champion"
+          ],
+          [
+            "/aws/sagemaker/Endpoints",
+            "MemoryUtilization",
+            "EndpointName",
+            "northstar-churn-prod",
+            "VariantName",
+            "champion"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Pipeline: Glue completed tasks",
+        "view": "timeSeries",
+        "region": "us-east-1",
+        "period": 300,
+        "metrics": [
+          [
+            {
+              "expression": "SELECT SUM(glue.driver.aggregate.numCompletedTasks) FROM SCHEMA(\"Glue\", JobName, JobRunId) WHERE JobName IN ('northstar-dev-transform','northstar-dev-feature-engineer')",
+              "id": "m1",
+              "label": "Glue completed tasks"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Model: Evidently drift result",
+        "view": "timeSeries",
+        "region": "us-east-1",
+        "period": 300,
+        "stat": "Maximum",
+        "metrics": [
+          [
+            "NorthStar/ChurnModel",
+            "DriftDetected",
+            "EndpointName",
+            "northstar-churn-prod"
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 1
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Application: champion latency percentiles (microseconds)",
+        "view": "timeSeries",
+        "region": "us-east-1",
+        "period": 300,
+        "metrics": [
+          [
+            "AWS/SageMaker",
+            "ModelLatency",
+            "EndpointName",
+            "northstar-churn-prod",
+            "VariantName",
+            "champion",
+            {
+              "stat": "p50",
+              "label": "p50"
+            }
+          ],
+          [
+            "AWS/SageMaker",
+            "ModelLatency",
+            "EndpointName",
+            "northstar-churn-prod",
+            "VariantName",
+            "champion",
+            {
+              "stat": "p95",
+              "label": "p95"
+            }
+          ],
+          [
+            "AWS/SageMaker",
+            "ModelLatency",
+            "EndpointName",
+            "northstar-churn-prod",
+            "VariantName",
+            "champion",
+            {
+              "stat": "p99",
+              "label": "p99"
+            }
+          ]
+        ],
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "200 ms alert",
+              "value": 200000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Business: daily churn alert volume proxy",
+        "view": "timeSeries",
+        "region": "us-east-1",
+        "period": 86400,
+        "stat": "Sum",
+        "metrics": [
+          [
+            "NorthStar/ChurnModel",
+            "ChurnAlertVolume",
+            "EndpointName",
+            "northstar-churn-prod"
+          ]
+        ]
+      }
+    }
+  ]
+}
